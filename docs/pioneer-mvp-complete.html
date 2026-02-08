@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pioneer - Discover Together</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, .heading {
+            font-family: 'Sora', sans-serif;
+        }
+        
+        .app-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .nav-item-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .nav-item-active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .avatar {
+            transition: all 0.3s ease;
+        }
+        
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .follow-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .follow-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            transform: scale(1.05);
+        }
+        
+        .badge {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .post-card {
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .post-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .like-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .like-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .like-btn-active {
+            color: #ef4444;
+            animation: heartBeat 0.3s ease;
+        }
+        
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        .trip-card {
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .trip-card:hover {
+            border-left-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(5px);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .member-avatar {
+            border: 3px solid white;
+            transition: all 0.3s ease;
+        }
+        
+        .member-avatar:hover {
+            transform: scale(1.15);
+            z-index: 10;
+        }
+        
+        .forum-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .forum-card:hover {
+            border-left-color: #764ba2;
+            background: rgba(118, 75, 162, 0.05);
+            transform: translateX(5px);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        input, textarea {
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .destination-tag {
+            transition: all 0.3s ease;
+        }
+        
+        .destination-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container min-h-screen">
+        <!-- Top Navigation -->
+        <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-purple-500">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-500 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                            P
+                        </div>
+                        <span class="text-2xl font-bold gradient-text">Pioneer</span>
+                    </div>
+                    
+                    <!-- Navigation Menu -->
+                    <div class="flex gap-3">
+                        <button onclick="switchView('feed')" id="nav-feed" class="nav-item nav-item-active px-6 py-2.5 rounded-full font-semibold">
+                            🏠 Feed
+                        </button>
+                        <button onclick="switchView('profile')" id="nav-profile" class="nav-item px-6 py-2.5 rounded-full font-semibold bg-gray-100 text-gray-700">
+                            👤 Profile
+                        </button>
+                        <button onclick="switchView('trips')" id="nav-trips" class="nav-item px-6 py-2.5 rounded-full font-semibold bg-gray-100 text-gray-700">
+                            ✈️ Trips
+                        </button>
+                        <button onclick="switchView('forums')" id="nav-forums" class="nav-item px-6 py-2.5 rounded-full font-semibold bg-gray-100 text-gray-700">
+                            💬 Forums
+                        </button>
+                    </div>
+                    
+                    <!-- User Avatar -->
+                    <div class="flex items-center gap-4">
+                        <button class="relative">
+                            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+                        </button>
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" class="avatar w-10 h-10 rounded-full border-2 border-purple-500" />
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            
+            <!-- FEED VIEW -->
+            <div id="view-feed" class="fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Left Sidebar - Profile Summary -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="text-center mb-4">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" class="w-24 h-24 rounded-full mx-auto mb-3 border-4 border-purple-500 shadow-lg" />
+                                <h3 class="text-xl font-bold text-gray-800">Sarah Martinez</h3>
+                                <p class="text-gray-500">@sarahexplores</p>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 mb-4">
+                                <div class="stat-card rounded-xl p-3 text-center">
+                                    <div class="text-2xl font-bold gradient-text">127</div>
+                                    <div class="text-xs text-gray-600">Reviews</div>
+                                </div>
+                                <div class="stat-card rounded-xl p-3 text-center">
+                                    <div class="text-2xl font-bold gradient-text">34</div>
+                                    <div class="text-xs text-gray-600">Countries</div>
+                                </div>
+                                <div class="stat-card rounded-xl p-3 text-center">
+                                    <div class="text-2xl font-bold gradient-text">2.4k</div>
+                                    <div class="text-xs text-gray-600">Followers</div>
+                                </div>
+                            </div>
+                            <button class="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
+                                View Full Profile
+                            </button>
+                        </div>
+                        
+                        <!-- Suggested Users -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4 gradient-text">Suggested Pioneers</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user2" class="w-12 h-12 rounded-full border-2 border-gray-200" />
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm">Mike Chen</div>
+                                        <div class="text-xs text-gray-500">89 countries</div>
+                                    </div>
+                                    <button class="follow-btn bg-purple-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold">Follow</button>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user3" class="w-12 h-12 rounded-full border-2 border-gray-200" />
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm">Emma Wilson</div>
+                                        <div class="text-xs text-gray-500">42 countries</div>
+                                    </div>
+                                    <button class="follow-btn bg-purple-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold">Follow</button>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user4" class="w-12 h-12 rounded-full border-2 border-gray-200" />
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm">James Lee</div>
+                                        <div class="text-xs text-gray-500">56 countries</div>
+                                    </div>
+                                    <button class="follow-btn bg-purple-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold">Follow</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Feed -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Create Post -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center gap-4 mb-4">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" class="w-12 h-12 rounded-full" />
+                                <input type="text" placeholder="Share your latest discovery..." class="flex-1 bg-gray-100 rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                            </div>
+                            <div class="flex gap-4">
+                                <button class="flex-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
+                                    📸 Add Photos
+                                </button>
+                                <button class="flex-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
+                                    📍 Tag Location
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Feed Posts -->
+                        <div class="post-card rounded-2xl shadow-lg overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user5" class="w-12 h-12 rounded-full border-2 border-purple-300" />
+                                    <div class="flex-1">
+                                        <div class="font-bold">Alex Rivera</div>
+                                        <div class="text-sm text-gray-500">📍 Tokyo, Japan • 2 hours ago</div>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-gray-600">
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <p class="text-gray-700 mb-4">Just discovered this hidden ramen shop in Shibuya! The tonkotsu broth is absolutely incredible. No tourists, all locals. This is what traveling is all about! 🍜✨</p>
+                                <img src="https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=800&h=500&fit=crop" class="w-full h-80 object-cover rounded-xl mb-4" />
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">⭐ 5/5</span>
+                                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">💰 Budget Friendly</span>
+                                    <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold">🌟 Hidden Gem</span>
+                                </div>
+                                <div class="flex items-center justify-between pt-4 border-t">
+                                    <button class="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors" onclick="toggleLike(this)">
+                                        <svg class="like-btn w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                        </svg>
+                                        <span class="font-semibold">247</span>
+                                    </button>
+                                    <button class="flex items-center gap-2 text-gray-600 hover:text-purple-500 transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                        </svg>
+                                        <span class="font-semibold">42</span>
+                                    </button>
+                                    <button class="flex items-center gap-2 text-gray-600 hover:text-purple-500 transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                        </svg>
+                                        <span class="font-semibold">Share</span>
+                                    </button>
+                                    <button class="flex items-center gap-2 text-gray-600 hover:text-purple-500 transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Another Post -->
+                        <div class="post-card rounded-2xl shadow-lg overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user6" class="w-12 h-12 rounded-full border-2 border-purple-300" />
+                                    <div class="flex-1">
+                                        <div class="font-bold">Maria Santos</div>
+                                        <div class="text-sm text-gray-500">📍 Barcelona, Spain • 5 hours ago</div>
+                                    </div>
+                                </div>
+                                <p class="text-gray-700 mb-4">Sunrise at Park Güell was absolutely magical! Got here at 6am to beat the crowds and it was totally worth it. Pro tip: book your tickets online the night before! 🌅</p>
+                                <img src="https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&h=500&fit=crop" class="w-full h-80 object-cover rounded-xl mb-4" />
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">⭐ 5/5</span>
+                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">📸 Instagram Worthy</span>
+                                </div>
+                                <div class="flex items-center justify-between pt-4 border-t">
+                                    <button class="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors" onclick="toggleLike(this)">
+                                        <svg class="like-btn w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                        </svg>
+                                        <span class="font-semibold">532</span>
+                                    </button>
+                                    <button class="flex items-center gap-2 text-gray-600 hover:text-purple-500 transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                        </svg>
+                                        <span class="font-semibold">78</span>
+                                    </button>
+                                    <button class="flex items-center gap-2 text-gray-600 hover:text-purple-500 transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                        </svg>
+                                        <span class="font-semibold">Share</span>
+                                    </button>
+                                    <button class="flex items-center gap-2 text-gray-600 hover:text-purple-500 transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROFILE VIEW -->
+            <div id="view-profile" class="hidden fade-in">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+                    <!-- Cover Photo -->
+                    <div class="h-64 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 relative">
+                        <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
+                            <div class="flex items-end gap-6">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" class="w-32 h-32 rounded-full border-4 border-white shadow-xl" />
+                                <div class="flex-1 text-white mb-4">
+                                    <h1 class="text-3xl font-bold mb-1">Sarah Martinez</h1>
+                                    <p class="text-lg opacity-90">@sarahexplores • Pioneer since 2023</p>
+                                    <p class="mt-2">✈️ Professional wanderer | 🌍 34 countries & counting | 📸 Chasing hidden gems</p>
+                                </div>
+                                <button class="mb-4 bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:shadow-lg transition-all">
+                                    Edit Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="grid grid-cols-5 gap-4 p-6 border-b">
+                        <div class="stat-card rounded-xl p-4 text-center">
+                            <div class="text-3xl font-bold gradient-text">127</div>
+                            <div class="text-sm text-gray-600 mt-1">Reviews</div>
+                        </div>
+                        <div class="stat-card rounded-xl p-4 text-center">
+                            <div class="text-3xl font-bold gradient-text">34</div>
+                            <div class="text-sm text-gray-600 mt-1">Countries</div>
+                        </div>
+                        <div class="stat-card rounded-xl p-4 text-center">
+                            <div class="text-3xl font-bold gradient-text">2.4k</div>
+                            <div class="text-sm text-gray-600 mt-1">Followers</div>
+                        </div>
+                        <div class="stat-card rounded-xl p-4 text-center">
+                            <div class="text-3xl font-bold gradient-text">856</div>
+                            <div class="text-sm text-gray-600 mt-1">Following</div>
+                        </div>
+                        <div class="stat-card rounded-xl p-4 text-center">
+                            <div class="text-3xl font-bold gradient-text">4.8</div>
+                            <div class="text-sm text-gray-600 mt-1">Avg Rating</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Badges -->
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-4 gradient-text">🏆 Achievements</h3>
+                        <div class="flex gap-4 flex-wrap">
+                            <div class="badge bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full font-semibold shadow-lg">
+                                🌟 Top Reviewer
+                            </div>
+                            <div class="badge bg-gradient-to-br from-blue-400 to-purple-500 text-white px-4 py-2 rounded-full font-semibold shadow-lg">
+                                🗺️ Globe Trotter
+                            </div>
+                            <div class="badge bg-gradient-to-br from-green-400 to-emerald-500 text-white px-4 py-2 rounded-full font-semibold shadow-lg">
+                                💎 Hidden Gem Hunter
+                            </div>
+                            <div class="badge bg-gradient-to-br from-pink-400 to-red-500 text-white px-4 py-2 rounded-full font-semibold shadow-lg">
+                                📸 Photography Pro
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Reviews Grid -->
+                <h3 class="font-bold text-2xl mb-4 gradient-text">📝 Recent Reviews</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop" class="w-full h-48 object-cover" />
+                        <div class="p-5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold">⭐ 5/5</span>
+                                <span class="text-xs text-gray-500">2 days ago</span>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Osteria Francescana</h4>
+                            <p class="text-sm text-gray-600 mb-3">📍 Modena, Italy</p>
+                            <p class="text-sm text-gray-700">An unforgettable culinary experience! Chef Massimo's creativity...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1528127269322-539801943592?w=400&h=300&fit=crop" class="w-full h-48 object-cover" />
+                        <div class="p-5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold">⭐ 4/5</span>
+                                <span class="text-xs text-gray-500">1 week ago</span>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Blue Lagoon</h4>
+                            <p class="text-sm text-gray-600 mb-3">📍 Iceland</p>
+                            <p class="text-sm text-gray-700">Beautiful but touristy. Go early morning for the best experience...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=400&h=300&fit=crop" class="w-full h-48 object-cover" />
+                        <div class="p-5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold">⭐ 5/5</span>
+                                <span class="text-xs text-gray-500">2 weeks ago</span>
+                            </div>
+                            <h4 class="font-bold text-lg mb-2">Haleakalā Summit</h4>
+                            <p class="text-sm text-gray-600 mb-3">📍 Maui, Hawaii</p>
+                            <p class="text-sm text-gray-700">Watching sunrise above the clouds was absolutely breathtaking...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRIPS VIEW -->
+            <div id="view-trips" class="hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Trip List -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-3xl font-bold gradient-text">✈️ Trip Planning</h2>
+                            <button class="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all">
+                                + New Trip
+                            </button>
+                        </div>
+                        
+                        <!-- Active Trip -->
+                        <div class="trip-card bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Active</span>
+                                    <h3 class="text-2xl font-bold mt-2">Summer Europe Adventure</h3>
+                                    <p class="text-gray-600">June 15 - July 30, 2024 • 45 days</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <!-- Trip Members -->
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="text-sm font-semibold text-gray-700">Trip Members:</span>
+                                <div class="flex -space-x-2">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user1" class="member-avatar w-8 h-8 rounded-full" />
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user7" class="member-avatar w-8 h-8 rounded-full" />
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user8" class="member-avatar w-8 h-8 rounded-full" />
+                                    <div class="member-avatar w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-xs font-bold">+2</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Destinations -->
+                            <div class="mb-4">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="destination-tag bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">📍 Paris</span>
+                                    <span class="destination-tag bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">📍 Barcelona</span>
+                                    <span class="destination-tag bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm font-semibold">📍 Rome</span>
+                                    <span class="destination-tag bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">📍 Amsterdam</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Progress -->
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between text-sm mb-2">
+                                    <span class="font-semibold text-gray-700">Planning Progress</span>
+                                    <span class="text-purple-600 font-bold">68%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-gradient-to-r from-purple-600 to-pink-500 h-3 rounded-full" style="width: 68%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Stats -->
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-purple-50 rounded-xl p-3 text-center">
+                                    <div class="text-2xl font-bold text-purple-600">23</div>
+                                    <div class="text-xs text-gray-600">Places Saved</div>
+                                </div>
+                                <div class="bg-pink-50 rounded-xl p-3 text-center">
+                                    <div class="text-2xl font-bold text-pink-600">12</div>
+                                    <div class="text-xs text-gray-600">Bookings Made</div>
+                                </div>
+                                <div class="bg-blue-50 rounded-xl p-3 text-center">
+                                    <div class="text-2xl font-bold text-blue-600">$3.2k</div>
+                                    <div class="text-xs text-gray-600">Est. Budget</div>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
+                                View Trip Details
+                            </button>
+                        </div>
+                        
+                        <!-- Past Trip -->
+                        <div class="trip-card bg-white rounded-2xl shadow-lg p-6 opacity-80">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-bold">Completed</span>
+                                    <h3 class="text-2xl font-bold mt-2">Japan Cherry Blossom Tour</h3>
+                                    <p class="text-gray-600">March 20 - April 5, 2024 • 16 days</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="destination-tag bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">📍 Tokyo</span>
+                                <span class="destination-tag bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold">📍 Kyoto</span>
+                                <span class="destination-tag bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">📍 Osaka</span>
+                            </div>
+                            <button class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all">
+                                View Memories
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar -->
+                    <div class="space-y-6">
+                        <!-- Collaboration Activity -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4 gradient-text">Recent Activity</h3>
+                            <div class="space-y-4">
+                                <div class="flex gap-3">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user7" class="w-10 h-10 rounded-full" />
+                                    <div>
+                                        <p class="text-sm"><span class="font-bold">Mike</span> added Hotel Le Meurice to Paris</p>
+                                        <p class="text-xs text-gray-500">2 hours ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user8" class="w-10 h-10 rounded-full" />
+                                    <div>
+                                        <p class="text-sm"><span class="font-bold">Lisa</span> voted for La Sagrada Familia</p>
+                                        <p class="text-xs text-gray-500">5 hours ago</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user9" class="w-10 h-10 rounded-full" />
+                                    <div>
+                                        <p class="text-sm"><span class="font-bold">Tom</span> commented on Rome itinerary</p>
+                                        <p class="text-xs text-gray-500">1 day ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Add -->
+                        <div class="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4 gradient-text">✨ Quick Add</h3>
+                            <input type="text" placeholder="Search for a place..." class="w-full px-4 py-3 rounded-xl border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3" />
+                            <button class="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
+                                Add to Trip
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORUMS VIEW -->
+            <div id="view-forums" class="hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Forum Topics -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-3xl font-bold gradient-text">💬 Community Forums</h2>
+                            <button class="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all">
+                                + New Topic
+                            </button>
+                        </div>
+                        
+                        <!-- Forum Post -->
+                        <div class="forum-card bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-start gap-4">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user10" class="w-12 h-12 rounded-full border-2 border-purple-300" />
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h3 class="font-bold text-lg">Best hidden restaurants in Tokyo?</h3>
+                                        <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold">🍜 Food</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">Posted by <span class="font-semibold">@foodie_traveler</span> • 3 hours ago</p>
+                                    <p class="text-gray-700 mb-4">Hey pioneers! I'm visiting Tokyo next month and looking for authentic local spots that tourists don't know about. Any recommendations? I love ramen, sushi, and yakitori!</p>
+                                    <div class="flex items-center gap-6 text-sm text-gray-600">
+                                        <span class="flex items-center gap-1">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                            </svg>
+                                            <span class="font-semibold">24 replies</span>
+                                        </span>
+                                        <span class="flex items-center gap-1">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            <span>156 views</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Another Forum Post -->
+                        <div class="forum-card bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-start gap-4">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user11" class="w-12 h-12 rounded-full border-2 border-purple-300" />
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h3 class="font-bold text-lg">Solo travel safety tips for Southeast Asia</h3>
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold">💡 Tips</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">Posted by <span class="font-semibold">@solo_sarah</span> • 1 day ago</p>
+                                    <p class="text-gray-700 mb-4">Planning my first solo trip through Thailand, Vietnam, and Cambodia. What safety tips do you wish you knew before your first solo adventure?</p>
+                                    <div class="flex items-center gap-6 text-sm text-gray-600">
+                                        <span class="flex items-center gap-1">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                            </svg>
+                                            <span class="font-semibold">67 replies</span>
+                                        </span>
+                                        <span class="flex items-center gap-1">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            <span>342 views</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Trending Discussion -->
+                        <div class="forum-card bg-white rounded-2xl shadow-lg p-6 border-2 border-purple-300">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-2xl">🔥</span>
+                                <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-bold">Trending</span>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user12" class="w-12 h-12 rounded-full border-2 border-purple-300" />
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h3 class="font-bold text-lg">Overrated vs Underrated European Cities</h3>
+                                        <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-bold">🗺️ Discussion</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">Posted by <span class="font-semibold">@europe_expert</span> • 2 days ago</p>
+                                    <p class="text-gray-700 mb-4">Let's debate! Which European cities are overrated and which hidden gems deserve more attention? I'll start: Prague is overrated, Ljubljana is underrated.</p>
+                                    <div class="flex items-center gap-6 text-sm text-gray-600">
+                                        <span class="flex items-center gap-1">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                            </svg>
+                                            <span class="font-semibold">189 replies</span>
+                                        </span>
+                                        <span class="flex items-center gap-1">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            <span>2.1k views</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar -->
+                    <div class="space-y-6">
+                        <!-- Categories -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4 gradient-text">📂 Categories</h3>
+                            <div class="space-y-2">
+                                <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-purple-50 transition-all flex items-center justify-between">
+                                    <span>🍜 Food & Dining</span>
+                                    <span class="text-sm text-gray-500">234</span>
+                                </button>
+                                <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-purple-50 transition-all flex items-center justify-between">
+                                    <span>🏨 Accommodation</span>
+                                    <span class="text-sm text-gray-500">156</span>
+                                </button>
+                                <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-purple-50 transition-all flex items-center justify-between">
+                                    <span>💡 Travel Tips</span>
+                                    <span class="text-sm text-gray-500">412</span>
+                                </button>
+                                <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-purple-50 transition-all flex items-center justify-between">
+                                    <span>📸 Photography</span>
+                                    <span class="text-sm text-gray-500">198</span>
+                                </button>
+                                <button class="w-full text-left px-4 py-3 rounded-xl hover:bg-purple-50 transition-all flex items-center justify-between">
+                                    <span>🗺️ Destinations</span>
+                                    <span class="text-sm text-gray-500">567</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Active Users -->
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-lg mb-4 gradient-text">🌟 Active Members</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="relative">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user13" class="w-10 h-10 rounded-full" />
+                                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm">Alex Chen</div>
+                                        <div class="text-xs text-gray-500">Online now</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="relative">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user14" class="w-10 h-10 rounded-full" />
+                                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm">Maya Patel</div>
+                                        <div class="text-xs text-gray-500">Online now</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="relative">
+                                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user15" class="w-10 h-10 rounded-full" />
+                                        <div class="absolute bottom-0 right-0 w-3 h-3 bg-yellow-500 rounded-full border-2 border-white"></div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm">David Kim</div>
+                                        <div class="text-xs text-gray-500">Away</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // View Switching
+        function switchView(view) {
+            // Hide all views
+            document.getElementById('view-feed').classList.add('hidden');
+            document.getElementById('view-profile').classList.add('hidden');
+            document.getElementById('view-trips').classList.add('hidden');
+            document.getElementById('view-forums').classList.add('hidden');
+            
+            // Show selected view
+            document.getElementById('view-' + view).classList.remove('hidden');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('nav-item-active', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            
+            document.getElementById('nav-' + view).classList.add('nav-item-active', 'text-white');
+            document.getElementById('nav-' + view).classList.remove('bg-gray-100', 'text-gray-700');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Like functionality
+        function toggleLike(btn) {
+            const svg = btn.querySelector('.like-btn');
+            const count = btn.querySelector('span');
+            
+            if (svg.getAttribute('fill') === 'currentColor') {
+                svg.setAttribute('fill', 'none');
+                svg.classList.remove('like-btn-active');
+                count.textContent = parseInt(count.textContent) - 1;
+            } else {
+                svg.setAttribute('fill', 'currentColor');
+                svg.classList.add('like-btn-active');
+                count.textContent = parseInt(count.textContent) + 1;
+            }
+        }
+        
+        // Follow button functionality
+        document.querySelectorAll('.follow-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.textContent === 'Follow') {
+                    this.textContent = 'Following';
+                    this.classList.remove('bg-purple-600');
+                    this.classList.add('bg-gray-200', 'text-gray-700');
+                } else {
+                    this.textContent = 'Follow';
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+                    this.classList.add('bg-purple-600', 'text-white');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
