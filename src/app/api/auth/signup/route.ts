@@ -90,9 +90,11 @@ export async function POST(request: NextRequest) {
       );
     }
     const errMsg = error instanceof Error ? error.message : String(error);
-    console.error('POST /api/auth/signup error:', error);
+    const dbUrl = process.env.DATABASE_URL;
+    const dbHint = dbUrl ? `DB host: ${dbUrl.split('@')[1]?.split('/')[0] ?? 'unknown'}` : 'DATABASE_URL is not set';
+    console.error('POST /api/auth/signup error:', error, dbHint);
     return NextResponse.json(
-      { error: { message: errMsg, code: 'INTERNAL_ERROR' } },
+      { error: { message: `${errMsg} [${dbHint}]`, code: 'INTERNAL_ERROR' } },
       { status: 500 }
     );
   }
