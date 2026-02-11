@@ -31,7 +31,7 @@ export function ProfileHeader({
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
       {/* Cover Photo */}
-      <div className="h-24 sm:h-36 md:h-48 relative">
+      <div className="h-16 sm:h-32 md:h-44 relative">
         {user.coverImageUrl ? (
           <img
             src={user.coverImageUrl}
