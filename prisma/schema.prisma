@@ -1,0 +1,582 @@
+// Pioneer - Community-Powered Travel Discovery Platform
+// Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// USER MODELS
+// ============================================
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  passwordHash       String?
+  name               String?
+  username           String?   @unique  // For profile URLs
+  bio                String?   @db.Text
+  avatarUrl          String?
+  coverImageUrl      String?
+  onboardingComplete Boolean   @default(false)
+  subscriptionTier   SubscriptionTier @default(FREE)
+
+  // Profile stats (denormalized for performance)
+  tripCount          Int       @default(0)
+  reviewCount        Int       @default(0)
+  followerCount      Int       @default(0)
+  followingCount     Int       @default(0)
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relations
+  interests          UserInterest[]
+  socialConnections  SocialConnection[]
+  saves              UserSave[]
+  views              UserView[]
+  sessions           Session[]
+  accounts           Account[]
+
+  // Community relations
+  trips              Trip[]
+  reviews            Review[]
+  photos             Photo[]
+  following          Follow[]   @relation("Following")
+  followers          Follow[]   @relation("Followers")
+
+  // Places added by user
+  placesAdded        Place[]    @relation("PlaceCreator")
+
+  // Forum relations
+  forumPosts         ForumPost[]
+  forumComments      ForumComment[]
+
+  // Likes
+  reviewLikes        ReviewLike[]
+  tripLikes          TripLike[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+// User interests from onboarding survey
+model UserInterest {
+  id        String   @id @default(cuid())
+  userId    String
+  category  InterestCategory
+  weight    Int      @default(5) // 1-10 scale
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category])
+  @@map("user_interests")
+}
+
+enum InterestCategory {
+  FOOD_DRINK
+  ART_CULTURE
+  OUTDOORS_NATURE
+  NIGHTLIFE
+  SHOPPING
+  HISTORY
+  ADVENTURE
+  RELAXATION
+  PHOTOGRAPHY
+  LOCAL_EXPERIENCES
+  ARCHITECTURE
+  MUSIC
+  SPORTS
+  WELLNESS
+}
+
+// Social media connections for preference inference
+model SocialConnection {
+  id           String   @id @default(cuid())
+  userId       String
+  platform     SocialPlatform
+  accessToken  String?  @db.Text
+  refreshToken String?  @db.Text
+  profileData  Json?
+  connectedAt  DateTime @default(now())
+  expiresAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@map("social_connections")
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  TIKTOK
+}
+
+// ============================================
+// FOLLOW SYSTEM
+// ============================================
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String   // User who is following
+  followingId String   // User being followed
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+// ============================================
+// LOCATION MODELS
+// ============================================
+
+model Country {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String   @unique  // ISO 3166-1 alpha-2
+  imageUrl  String?
+
+  cities    City[]
+  forums    Forum[]
+
+  @@map("countries")
+}
+
+model City {
+  id        String   @id @default(cuid())
+  countryId String
+  name      String
+  latitude  Float
+  longitude Float
+  timezone  String
+  imageUrl  String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  country Country @relation(fields: [countryId], references: [id])
+  places  Place[]
+  trips   Trip[]
+  forums  Forum[]
+
+  @@unique([name, countryId])
+  @@map("cities")
+}
+
+// ============================================
+// PLACE MODELS (User-generated)
+// ============================================
+
+model Place {
+  id              String   @id @default(cuid())
+  cityId          String
+  createdById     String   // User who added this place
+
+  // Basic info
+  name            String
+  description     String?  @db.Text
+  category        PlaceCategory
+
+  // Location
+  latitude        Float
+  longitude       Float
+  address         String
+  neighborhood    String?
+
+  // Attributes
+  estimatedDuration Int?     // minutes
+  priceLevel      PriceLevel?
+
+  // Media
+  imageUrl        String?  // Primary image
+
+  // Google Places integration (optional)
+  googlePlaceId   String?  @unique
+
+  // Aggregated ratings (computed from reviews)
+  avgOverallRating    Float?
+  avgValueRating      Float?
+  avgAuthenticityRating Float?
+  avgCrowdRating      Float?  // Lower = less crowded = better
+  totalReviewCount    Int     @default(0)
+
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  city            City     @relation(fields: [cityId], references: [id])
+  createdBy       User     @relation("PlaceCreator", fields: [createdById], references: [id])
+  tags            PlaceTag[]
+  reviews         Review[]
+  photos          Photo[]
+  tripStops       TripStop[]
+  saves           UserSave[]
+
+  @@index([cityId])
+  @@index([category])
+  @@index([latitude, longitude])
+  @@map("places")
+}
+
+enum PlaceCategory {
+  RESTAURANT
+  CAFE
+  BAR
+  NIGHTCLUB
+  MUSEUM
+  GALLERY
+  MONUMENT
+  LANDMARK
+  PARK
+  BEACH
+  VIEWPOINT
+  MARKET
+  SHOP
+  HOTEL
+  HOSTEL
+  TOUR
+  ACTIVITY
+  HIDDEN_GEM
+  OTHER
+}
+
+enum PriceLevel {
+  FREE
+  BUDGET      // $
+  MODERATE    // $$
+  EXPENSIVE   // $$$
+  LUXURY      // $$$$
+}
+
+// Place tags for filtering
+model PlaceTag {
+  id      String @id @default(cuid())
+  placeId String
+  tag     String
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([placeId, tag])
+  @@index([tag])
+  @@map("place_tags")
+}
+
+// ============================================
+// REVIEW SYSTEM
+// ============================================
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  placeId   String
+  tripId    String?  // Optional: link to trip if part of a trip
+
+  // Multi-category ratings (1-5)
+  overallRating     Int      // Required
+  valueRating       Int?     // Was it worth it?
+  authenticityRating Int?    // How authentic/local?
+  crowdRating       Int?     // 1=packed, 5=empty
+
+  // Review content
+  title         String?
+  content       String   @db.Text
+  visitedAt     DateTime?  // When they visited
+
+  // Helpful votes
+  likeCount     Int      @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place  Place  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  trip   Trip?  @relation(fields: [tripId], references: [id])
+  photos Photo[]
+  likes  ReviewLike[]
+
+  @@unique([userId, placeId])  // One review per user per place
+  @@index([placeId])
+  @@index([userId])
+  @@map("reviews")
+}
+
+model ReviewLike {
+  id        String   @id @default(cuid())
+  userId    String
+  reviewId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reviewId])
+  @@map("review_likes")
+}
+
+// ============================================
+// TRIP SYSTEM
+// ============================================
+
+model Trip {
+  id          String   @id @default(cuid())
+  userId      String
+  cityId      String
+
+  // Trip details
+  title       String
+  description String?  @db.Text
+  startDate   DateTime?
+  endDate     DateTime?
+
+  // Visibility
+  isPublic    Boolean  @default(true)
+
+  // Cover image
+  coverImageUrl String?
+
+  // Engagement
+  likeCount   Int      @default(0)
+  viewCount   Int      @default(0)
+
+  // Status
+  status      TripStatus @default(PLANNING)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?  // When made public
+
+  user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  city    City       @relation(fields: [cityId], references: [id])
+  stops   TripStop[]
+  reviews Review[]   // Reviews written during this trip
+  photos  Photo[]
+  likes   TripLike[]
+
+  @@index([userId])
+  @@index([cityId])
+  @@index([status, isPublic])
+  @@map("trips")
+}
+
+enum TripStatus {
+  PLANNING    // Still planning
+  IN_PROGRESS // Currently traveling
+  COMPLETED   // Trip finished
+}
+
+model TripStop {
+  id        String   @id @default(cuid())
+  tripId    String
+  placeId   String
+
+  // Order in the trip
+  dayNumber Int?     // Day 1, Day 2, etc.
+  orderInDay Int     @default(0)
+
+  // Notes specific to this stop
+  notes     String?  @db.Text
+
+  // Time spent
+  arrivalTime   DateTime?
+  departureTime DateTime?
+
+  createdAt DateTime @default(now())
+
+  trip  Trip  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+  @@map("trip_stops")
+}
+
+model TripLike {
+  id        String   @id @default(cuid())
+  userId    String
+  tripId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tripId])
+  @@map("trip_likes")
+}
+
+// ============================================
+// PHOTOS
+// ============================================
+
+model Photo {
+  id        String   @id @default(cuid())
+  userId    String
+  placeId   String?
+  reviewId  String?
+  tripId    String?
+
+  url       String
+  caption   String?
+
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place  Place?  @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  review Review? @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  trip   Trip?   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([placeId])
+  @@index([userId])
+  @@map("photos")
+}
+
+// ============================================
+// SAVES (Bookmarks)
+// ============================================
+
+model UserSave {
+  id        String   @id @default(cuid())
+  userId    String
+  placeId   String
+  savedAt   DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, placeId])
+  @@map("user_saves")
+}
+
+model UserView {
+  id               String   @id @default(cuid())
+  userId           String
+  placeId          String?
+  tripId           String?
+  viewedAt         DateTime @default(now())
+  timeSpentSeconds Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_views")
+}
+
+// ============================================
+// FORUM SYSTEM
+// ============================================
+
+model Forum {
+  id          String   @id @default(cuid())
+  countryId   String?
+  cityId      String?
+
+  name        String
+  description String?
+  slug        String   @unique
+
+  postCount   Int      @default(0)
+
+  createdAt   DateTime @default(now())
+
+  country Country? @relation(fields: [countryId], references: [id])
+  city    City?    @relation(fields: [cityId], references: [id])
+  posts   ForumPost[]
+
+  @@map("forums")
+}
+
+model ForumPost {
+  id        String   @id @default(cuid())
+  forumId   String
+  userId    String
+
+  title     String
+  content   String   @db.Text
+
+  isPinned  Boolean  @default(false)
+
+  viewCount    Int   @default(0)
+  commentCount Int   @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  forum    Forum          @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments ForumComment[]
+
+  @@index([forumId])
+  @@map("forum_posts")
+}
+
+model ForumComment {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  parentId  String?  // For nested replies
+
+  content   String   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post    ForumPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  ForumComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies ForumComment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@map("forum_comments")
+}

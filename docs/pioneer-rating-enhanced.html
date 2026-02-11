@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pioneer - Share Your Adventure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            zoom: 0.7;
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1, h2, .section-title {
+            font-family: 'Sora', sans-serif;
+        }
+        
+        .card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.95);
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: pulse 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            50% { box-shadow: 0 0 20px 10px rgba(102, 126, 234, 0); }
+        }
+        
+        .star {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .star:hover {
+            transform: scale(1.2) rotate(8deg);
+        }
+        
+        .star:active {
+            transform: scale(0.95);
+        }
+        
+        .star-filled {
+            fill: #fbbf24;
+            stroke: #f59e0b;
+            animation: starPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes starPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        .star-empty {
+            fill: none;
+            stroke: #d1d5db;
+        }
+        
+        .category-btn {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+        
+        .category-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .category-btn-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .tag-btn {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .tag-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        .tag-btn-active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-color: #f5576c;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+        
+        .rating-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .rating-card:hover {
+            border-left-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(5px);
+        }
+        
+        .photo-preview {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .photo-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .photo-preview:hover .remove-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .remove-btn {
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .upload-zone {
+            transition: all 0.3s ease;
+            border: 3px dashed #d1d5db;
+        }
+        
+        .upload-zone:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            transform: scale(1.02);
+        }
+        
+        textarea {
+            transition: all 0.3s ease;
+        }
+        
+        textarea:focus {
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            border-color: #667eea !important;
+        }
+        
+        .submit-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+        
+        .submit-btn:not(:disabled):hover::before {
+            width: 400px;
+            height: 400px;
+        }
+        
+        .submit-btn:not(:disabled):hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .submit-btn:not(:disabled):active {
+            transform: translateY(-1px);
+        }
+        
+        .emoji-float {
+            position: absolute;
+            font-size: 2rem;
+            animation: float 3s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        input[type="date"] {
+            transition: all 0.3s ease;
+        }
+        
+        input[type="date"]:focus {
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            border-color: #667eea !important;
+        }
+        
+        .success-message {
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="container max-w-4xl mx-auto">
+        
+        <!-- Decorative floating emojis -->
+        <div class="emoji-float" style="top: 5%; left: 10%;">✨</div>
+        <div class="emoji-float" style="top: 15%; right: 15%; animation-delay: 1s;">🌟</div>
+        <div class="emoji-float" style="bottom: 20%; left: 8%; animation-delay: 2s;">🎯</div>
+        
+        <!-- Header -->
+        <div class="card rounded-3xl shadow-2xl p-8 mb-6 border-b-8 border-purple-500 stagger-1">
+            <div class="flex items-start gap-6">
+                <div class="logo-container w-20 h-20 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-xl">
+                    P
+                </div>
+                <div class="flex-1">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">Share Your Adventure! 🚀</h1>
+                    <p class="text-lg text-gray-600 mb-3">Help fellow pioneers discover amazing places</p>
+                    <div class="flex items-center gap-3 text-purple-600 bg-purple-50 px-4 py-2 rounded-full inline-flex">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="font-semibold">Café de Flore, Paris, France</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form -->
+        <div class="card rounded-3xl shadow-2xl p-8 space-y-8 stagger-2">
+            
+            <!-- Category Selection -->
+            <div>
+                <h2 class="section-header text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span>🎭</span> What type of place is this?
+                </h2>
+                <div class="flex flex-wrap gap-3" id="categories"></div>
+            </div>
+
+            <!-- Visit Date -->
+            <div>
+                <h2 class="section-header text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span>📅</span> When did you visit?
+                </h2>
+                <input
+                    type="date"
+                    id="visitDate"
+                    max=""
+                    class="w-full px-6 py-4 border-3 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none text-lg font-medium"
+                />
+            </div>
+
+            <!-- Rating Categories -->
+            <div class="space-y-5">
+                <h2 class="section-header text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span>⭐</span> Rate Your Experience
+                </h2>
+                
+                <!-- Overall Experience -->
+                <div class="rating-card bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">✨</span>
+                            <div>
+                                <span class="font-bold text-gray-800 text-lg block">Overall Experience</span>
+                                <span class="text-sm text-gray-500">How was it overall?</span>
+                            </div>
+                        </div>
+                        <span class="text-lg font-bold text-purple-600 bg-white px-4 py-2 rounded-full shadow" id="overall-rating-text">Not rated</span>
+                    </div>
+                    <div class="flex gap-2" id="overall-stars"></div>
+                </div>
+
+                <!-- Value for Money -->
+                <div class="rating-card bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">💰</span>
+                            <div>
+                                <span class="font-bold text-gray-800 text-lg block">Value for Money</span>
+                                <span class="text-sm text-gray-500">Worth the price?</span>
+                            </div>
+                        </div>
+                        <span class="text-lg font-bold text-purple-600 bg-white px-4 py-2 rounded-full shadow" id="value-rating-text">Not rated</span>
+                    </div>
+                    <div class="flex gap-2" id="value-stars"></div>
+                </div>
+
+                <!-- Authenticity -->
+                <div class="rating-card bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">🌟</span>
+                            <div>
+                                <span class="font-bold text-gray-800 text-lg block">Authenticity</span>
+                                <span class="text-sm text-gray-500">Genuine local experience?</span>
+                            </div>
+                        </div>
+                        <span class="text-lg font-bold text-purple-600 bg-white px-4 py-2 rounded-full shadow" id="authenticity-rating-text">Not rated</span>
+                    </div>
+                    <div class="flex gap-2" id="authenticity-stars"></div>
+                </div>
+
+                <!-- Crowd Level -->
+                <div class="rating-card bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 shadow-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">👥</span>
+                            <div>
+                                <span class="font-bold text-gray-800 text-lg block">Crowd Level</span>
+                                <span class="text-sm text-gray-500">How busy was it? (lower is better)</span>
+                            </div>
+                        </div>
+                        <span class="text-lg font-bold text-purple-600 bg-white px-4 py-2 rounded-full shadow" id="crowdLevel-rating-text">Not rated</span>
+                    </div>
+                    <div class="flex gap-2" id="crowdLevel-stars"></div>
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div>
+                <h2 class="section-header text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span>🏷️</span> Add Some Vibes (Optional)
+                </h2>
+                <div class="flex flex-wrap gap-3" id="tags"></div>
+            </div>
+
+            <!-- Photo Upload -->
+            <div>
+                <h2 class="section-header text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span>📸</span> Share Your Pics
+                </h2>
+                <p class="text-gray-600 mb-4">A picture is worth a thousand words!</p>
+                <div class="grid grid-cols-3 gap-4" id="photo-grid">
+                    <label class="upload-zone h-40 rounded-2xl flex flex-col items-center justify-center cursor-pointer">
+                        <svg class="w-12 h-12 text-purple-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-600">Add Photos</span>
+                        <span class="text-xs text-gray-400 mt-1">Up to 6 images</span>
+                        <input type="file" accept="image/*" multiple id="photoInput" class="hidden" />
+                    </label>
+                </div>
+            </div>
+
+            <!-- Review Text -->
+            <div>
+                <h2 class="section-header text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span>✍️</span> Tell Your Story
+                </h2>
+                <textarea
+                    id="reviewText"
+                    placeholder="What made this place special? Any insider tips for fellow pioneers? Share the magic! ✨"
+                    rows="6"
+                    class="w-full px-6 py-4 border-3 border-gray-200 rounded-2xl focus:outline-none resize-none text-lg"
+                ></textarea>
+                <div class="mt-2 text-sm font-medium text-gray-500 flex items-center gap-2" id="char-count">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>0 characters (minimum 10 to submit)</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Submit Button -->
+        <div class="card rounded-3xl shadow-2xl p-8 mt-6 stagger-3">
+            <button
+                id="submitBtn"
+                disabled
+                class="submit-btn w-full py-6 rounded-2xl font-bold text-2xl transition-all bg-gray-200 text-gray-400 cursor-not-allowed relative"
+            >
+                <span class="relative z-10">Complete the required fields ⬆️</span>
+            </button>
+            <p class="success-message text-center text-lg text-gray-600 mt-4 hidden font-medium" id="successMsg">
+                🎉 Your review will help fellow pioneers discover amazing places!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // State
+        const state = {
+            ratings: {
+                overall: 0,
+                value: 0,
+                authenticity: 0,
+                crowdLevel: 0
+            },
+            selectedCategory: 'Restaurant',
+            tags: [],
+            photos: [],
+            reviewText: '',
+            visitDate: ''
+        };
+
+        const categories = ['Restaurant', 'Attraction', 'Hidden Gem', 'Cafe', 'Museum', 'Nature'];
+        const popularTags = ['Must Visit', 'Instagram Worthy', 'Budget Friendly', 'Family Friendly', 'Romantic', 'Local Favorite'];
+
+        // Set max date for visit date input
+        document.getElementById('visitDate').max = new Date().toISOString().split('T')[0];
+
+        // Render categories
+        function renderCategories() {
+            const container = document.getElementById('categories');
+            container.innerHTML = categories.map(cat => `
+                <button
+                    onclick="selectCategory('${cat}')"
+                    class="category-btn px-6 py-3 rounded-full text-base font-bold transition-all ${
+                        state.selectedCategory === cat
+                            ? 'category-btn-active text-white'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
+                    }"
+                >
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        // Render tags
+        function renderTags() {
+            const container = document.getElementById('tags');
+            container.innerHTML = popularTags.map(tag => `
+                <button
+                    onclick="toggleTag('${tag}')"
+                    class="tag-btn px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+                        state.tags.includes(tag)
+                            ? 'tag-btn-active text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50 shadow-md'
+                    }"
+                >
+                    ${state.tags.includes(tag) ? '✓ ' : ''}${tag}
+                </button>
+            `).join('');
+        }
+
+        // Render star ratings
+        function renderStars(category) {
+            const container = document.getElementById(`${category}-stars`);
+            const currentRating = state.ratings[category];
+            
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                star.classList.add('star', 'w-10', 'h-10');
+                star.setAttribute('viewBox', '0 0 24 24');
+                star.setAttribute('stroke-width', '2');
+                star.setAttribute('stroke-linecap', 'round');
+                star.setAttribute('stroke-linejoin', 'round');
+                
+                if (i <= currentRating) {
+                    star.classList.add('star-filled');
+                } else {
+                    star.classList.add('star-empty');
+                }
+                
+                star.innerHTML = '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>';
+                
+                star.addEventListener('click', () => setRating(category, i));
+                star.addEventListener('mouseenter', () => highlightStars(category, i));
+                star.addEventListener('mouseleave', () => highlightStars(category, currentRating));
+                
+                container.appendChild(star);
+            }
+        }
+
+        function highlightStars(category, rating) {
+            const container = document.getElementById(`${category}-stars`);
+            const stars = container.querySelectorAll('.star');
+            
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('star-filled');
+                    star.classList.remove('star-empty');
+                } else {
+                    star.classList.add('star-empty');
+                    star.classList.remove('star-filled');
+                }
+            });
+        }
+
+        function setRating(category, rating) {
+            state.ratings[category] = rating;
+            document.getElementById(`${category}-rating-text`).textContent = `${rating}/5 ⭐`;
+            renderStars(category);
+            validateForm();
+        }
+
+        function selectCategory(category) {
+            state.selectedCategory = category;
+            renderCategories();
+        }
+
+        function toggleTag(tag) {
+            if (state.tags.includes(tag)) {
+                state.tags = state.tags.filter(t => t !== tag);
+            } else {
+                state.tags.push(tag);
+            }
+            renderTags();
+        }
+
+        // Photo upload
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            
+            files.forEach(file => {
+                if (state.photos.length >= 6) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    state.photos.push({
+                        id: Math.random(),
+                        url: event.target.result,
+                        name: file.name
+                    });
+                    renderPhotos();
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            e.target.value = '';
+        });
+
+        function renderPhotos() {
+            const grid = document.getElementById('photo-grid');
+            grid.innerHTML = state.photos.map(photo => `
+                <div class="photo-preview">
+                    <img src="${photo.url}" alt="${photo.name}" class="w-full h-40 object-cover" />
+                    <button
+                        onclick="removePhoto(${photo.id})"
+                        class="remove-btn absolute top-3 right-3 bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+            
+            if (state.photos.length < 6) {
+                grid.innerHTML += `
+                    <label class="upload-zone h-40 rounded-2xl flex flex-col items-center justify-center cursor-pointer">
+                        <svg class="w-12 h-12 text-purple-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-600">Add More</span>
+                        <input type="file" accept="image/*" multiple id="photoInput2" class="hidden" />
+                    </label>
+                `;
+                document.getElementById('photoInput2').addEventListener('change', document.getElementById('photoInput').onchange);
+            }
+        }
+
+        function removePhoto(id) {
+            state.photos = state.photos.filter(photo => photo.id !== id);
+            renderPhotos();
+        }
+
+        // Review text
+        document.getElementById('reviewText').addEventListener('input', function(e) {
+            state.reviewText = e.target.value;
+            const count = e.target.value.length;
+            const countEl = document.getElementById('char-count');
+            countEl.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>${count} characters ${count < 10 ? '(minimum 10 to submit)' : '✅'}</span>
+            `;
+            if (count >= 10) {
+                countEl.classList.add('text-green-600');
+                countEl.classList.remove('text-gray-500');
+            } else {
+                countEl.classList.add('text-gray-500');
+                countEl.classList.remove('text-green-600');
+            }
+            validateForm();
+        });
+
+        // Visit date
+        document.getElementById('visitDate').addEventListener('change', function(e) {
+            state.visitDate = e.target.value;
+            validateForm();
+        });
+
+        // Form validation
+        function validateForm() {
+            const isValid = state.ratings.overall > 0 && 
+                           state.reviewText.length >= 10 && 
+                           state.visitDate;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const successMsg = document.getElementById('successMsg');
+            
+            if (isValid) {
+                submitBtn.disabled = false;
+                submitBtn.className = 'submit-btn w-full py-6 rounded-2xl font-bold text-2xl transition-all text-white relative';
+                submitBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                submitBtn.innerHTML = '<span class="relative z-10">Share Your Experience! 🚀✨</span>';
+                successMsg.classList.remove('hidden');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.className = 'submit-btn w-full py-6 rounded-2xl font-bold text-2xl transition-all bg-gray-200 text-gray-400 cursor-not-allowed relative';
+                submitBtn.innerHTML = '<span class="relative z-10">Complete the required fields ⬆️</span>';
+                successMsg.classList.add('hidden');
+            }
+        }
+
+        // Submit
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            if (!this.disabled) {
+                console.log('Review submitted:', state);
+                this.innerHTML = '<span class="relative z-10">✅ Review Submitted! Thank you!</span>';
+                this.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                setTimeout(() => {
+                    alert('🎉 Your review has been shared with the Pioneer community!');
+                }, 300);
+            }
+        });
+
+        // Initialize
+        renderCategories();
+        renderTags();
+        ['overall', 'value', 'authenticity', 'crowdLevel'].forEach(renderStars);
+    </script>
+</body>
+</html>
