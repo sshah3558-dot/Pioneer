@@ -1,12 +1,12 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from '@/lib/db/prisma';
 import { verifyPassword } from './password';
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
+  // Note: PrismaAdapter removed — it conflicts with CredentialsProvider + JWT strategy.
+  // The adapter is only needed for OAuth auto-provisioning and DB sessions.
   providers: [
     CredentialsProvider({
       name: 'credentials',
