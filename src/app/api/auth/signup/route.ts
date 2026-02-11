@@ -89,9 +89,10 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    const errMsg = error instanceof Error ? error.message : String(error);
     console.error('POST /api/auth/signup error:', error);
     return NextResponse.json(
-      { error: { message: 'Internal server error', code: 'INTERNAL_ERROR' } },
+      { error: { message: errMsg, code: 'INTERNAL_ERROR' } },
       { status: 500 }
     );
   }
