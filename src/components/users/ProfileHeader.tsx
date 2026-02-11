@@ -31,7 +31,7 @@ export function ProfileHeader({
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
       {/* Cover Photo */}
-      <div className="h-36 sm:h-48 md:h-64 relative">
+      <div className="h-24 sm:h-36 md:h-48 relative">
         {user.coverImageUrl ? (
           <img
             src={user.coverImageUrl}
@@ -46,11 +46,11 @@ export function ProfileHeader({
       {/* Profile info below cover */}
       <div className="px-4 sm:px-6 pb-4">
         {/* Avatar + Action button row */}
-        <div className="flex items-end justify-between -mt-12 sm:-mt-16 mb-3">
+        <div className="flex items-end justify-between -mt-8 sm:-mt-12 mb-3">
           <img
             src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=667eea&color=fff&size=128`}
             alt={user.name || 'User'}
-            className="w-20 h-20 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-xl object-cover"
+            className="w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-3 sm:border-4 border-white shadow-xl object-cover"
           />
           <div className="mb-1">
             {isOwnProfile ? (
