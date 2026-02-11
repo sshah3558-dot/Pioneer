@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Eye, EyeOff, Mail, Lock, User, AtSign } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { GradientButton } from '@/components/shared/GradientButton';
@@ -26,7 +27,6 @@ export function SignupForm() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
-    // Clear error for this field
     if (errors[e.target.name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -81,11 +81,47 @@ export function SignupForm() {
     setIsLoading(true);
 
     try {
-      // Simulate API call - replace with actual API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          username: formData.username,
+        }),
+      });
 
-      // Redirect to onboarding after signup
+      const data = await res.json();
+
+      if (!res.ok) {
+        const code = data.error?.code;
+        if (code === 'EMAIL_EXISTS') {
+          setErrors({ email: 'This email is already registered' });
+        } else if (code === 'USERNAME_EXISTS') {
+          setErrors({ username: 'This username is already taken' });
+        } else if (code === 'WEAK_PASSWORD') {
+          setErrors({ password: data.error?.message || 'Password is too weak' });
+        } else {
+          setErrors({ general: data.error?.message || 'Something went wrong' });
+        }
+        return;
+      }
+
+      // Auto-login after successful signup
+      const signInResult = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        setErrors({ general: 'Account created but login failed. Please sign in manually.' });
+        return;
+      }
+
       router.push('/onboarding');
+      router.refresh();
     } catch {
       setErrors({ general: 'Something went wrong. Please try again.' });
     } finally {
@@ -232,6 +268,7 @@ export function SignupForm() {
       {/* Google OAuth */}
       <button
         type="button"
+        onClick={() => signIn('google', { callbackUrl: '/onboarding' })}
         className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">

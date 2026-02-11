@@ -1,16 +1,35 @@
 'use client';
 
 import Link from 'next/link';
-import { mockCurrentUser } from '@/lib/mock-data';
+import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 
 export function ProfileSummary() {
-  const user = mockCurrentUser;
+  const { user, isLoading } = useCurrentUser();
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-lg p-6 animate-pulse">
+        <div className="text-center mb-4">
+          <div className="w-24 h-24 rounded-full mx-auto mb-3 bg-gray-200" />
+          <div className="h-5 bg-gray-200 rounded w-32 mx-auto mb-2" />
+          <div className="h-4 bg-gray-200 rounded w-24 mx-auto" />
+        </div>
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-xl p-3 bg-gray-100 h-16" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6">
       <div className="text-center mb-4">
         <img
-          src={user.avatarUrl || ''}
+          src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=667eea&color=fff`}
           alt={user.name || 'User'}
           className="w-24 h-24 rounded-full mx-auto mb-3 border-4 border-purple-500 shadow-lg object-cover"
         />

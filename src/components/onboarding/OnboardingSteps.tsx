@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { ArrowLeft, ArrowRight, Check, Sparkles, Instagram } from 'lucide-react';
 import { GradientButton } from '@/components/shared/GradientButton';
 import { InterestSelector } from './InterestSelector';
@@ -24,8 +25,10 @@ const totalSteps = 6;
 
 export function OnboardingSteps() {
   const router = useRouter();
+  const { update } = useSession();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const [data, setData] = useState<OnboardingData>({
     travelerType: null,
     interests: [],
@@ -48,12 +51,55 @@ export function OnboardingSteps() {
 
   const handleComplete = async () => {
     setIsSubmitting(true);
+    setError('');
     try {
-      // Simulate API call to save onboarding data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Save interests
+      const interestsPayload = data.interests.map((category) => ({
+        category,
+        weight: 5,
+      }));
+
+      const interestsRes = await fetch('/api/users/me/interests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interests: interestsPayload }),
+      });
+
+      if (!interestsRes.ok) {
+        throw new Error('Failed to save interests');
+      }
+
+      // Save profile preferences (traveler type, budget, pace as bio metadata)
+      const bioData = [
+        data.travelerType && `Traveler: ${data.travelerType}`,
+        data.budgetLevel && `Budget: ${data.budgetLevel}`,
+        data.travelPace && `Pace: ${data.travelPace}`,
+      ]
+        .filter(Boolean)
+        .join(' | ');
+
+      await fetch('/api/users/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bio: bioData }),
+      });
+
+      // Mark onboarding complete
+      const onboardingRes = await fetch('/api/users/me/onboarding', {
+        method: 'POST',
+      });
+
+      if (!onboardingRes.ok) {
+        throw new Error('Failed to complete onboarding');
+      }
+
+      // Refresh the session so middleware knows onboarding is complete
+      await update();
+
       router.push('/feed');
+      router.refresh();
     } catch {
-      console.error('Failed to complete onboarding');
+      setError('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -62,7 +108,7 @@ export function OnboardingSteps() {
   const canProceed = () => {
     switch (currentStep) {
       case 0:
-        return true; // Welcome step
+        return true;
       case 1:
         return data.travelerType !== null;
       case 2:
@@ -72,7 +118,7 @@ export function OnboardingSteps() {
       case 4:
         return data.travelPace !== null;
       case 5:
-        return true; // Social connections is optional
+        return true;
       default:
         return true;
     }
@@ -134,6 +180,12 @@ export function OnboardingSteps() {
               value={data.socialConnections}
               onChange={(connections) => setData(prev => ({ ...prev, socialConnections: connections }))}
             />
+          )}
+
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm text-center">
+              {error}
+            </div>
           )}
         </div>
       </div>

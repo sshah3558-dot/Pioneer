@@ -1,47 +1,116 @@
 'use client';
 
 import { useState } from 'react';
-import { mockSuggestedUsers } from '@/lib/mock-data';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/fetcher';
+
+interface SuggestedUser {
+  id: string;
+  name: string | null;
+  username: string | null;
+  avatarUrl: string | null;
+  tripCount: number;
+  reviewCount: number;
+  followerCount: number;
+}
 
 export function SuggestedUsers() {
+  const queryClient = useQueryClient();
   const [following, setFollowing] = useState<Set<string>>(new Set());
+  const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set());
 
-  const toggleFollow = (userId: string) => {
-    setFollowing((prev) => {
-      const next = new Set(prev);
-      if (next.has(userId)) {
-        next.delete(userId);
+  const { data, isLoading } = useQuery({
+    queryKey: ['suggestedUsers'],
+    queryFn: () => apiFetch<{ users: SuggestedUser[] }>('/api/users/suggested'),
+  });
+
+  const toggleFollow = async (userId: string) => {
+    const isCurrentlyFollowing = following.has(userId);
+    setLoadingIds((prev) => new Set(prev).add(userId));
+
+    try {
+      if (isCurrentlyFollowing) {
+        await fetch('/api/follow', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        });
+        setFollowing((prev) => {
+          const next = new Set(prev);
+          next.delete(userId);
+          return next;
+        });
       } else {
-        next.add(userId);
+        await fetch('/api/follow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        });
+        setFollowing((prev) => new Set(prev).add(userId));
       }
-      return next;
-    });
+      // Invalidate feed so it refreshes with new followed user's content
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    } catch (err) {
+      console.error('Follow toggle failed:', err);
+    } finally {
+      setLoadingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(userId);
+        return next;
+      });
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-lg p-6 animate-pulse">
+        <div className="h-5 bg-gray-200 rounded w-40 mb-4" />
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full bg-gray-200" />
+            <div className="flex-1">
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1" />
+              <div className="h-3 bg-gray-200 rounded w-16" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const users = data?.users || [];
+
+  if (users.length === 0) return null;
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6">
       <h3 className="font-bold text-lg mb-4 gradient-text-135">Suggested Pioneers</h3>
       <div className="space-y-4">
-        {mockSuggestedUsers.map((user) => {
+        {users.map((user) => {
           const isFollowing = following.has(user.id);
+          const isLoadingFollow = loadingIds.has(user.id);
           return (
             <div key={user.id} className="flex items-center gap-3">
               <img
-                src={user.avatarUrl || ''}
+                src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=667eea&color=fff`}
                 alt={user.name || 'User'}
                 className="w-12 h-12 rounded-full border-2 border-gray-200 object-cover"
               />
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm truncate">{user.name}</div>
-                <div className="text-xs text-gray-500">{user.stat}</div>
+                <div className="text-xs text-gray-500">
+                  {user.tripCount} trips &middot; {user.reviewCount} reviews
+                </div>
               </div>
               <button
                 onClick={() => toggleFollow(user.id)}
+                disabled={isLoadingFollow}
                 className={`follow-btn px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
                   isFollowing
                     ? 'bg-gray-200 text-gray-700'
                     : 'bg-purple-600 text-white'
-                }`}
+                } ${isLoadingFollow ? 'opacity-50' : ''}`}
               >
                 {isFollowing ? 'Following' : 'Follow'}
               </button>

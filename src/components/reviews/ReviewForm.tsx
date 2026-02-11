@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { AnimatedRatingStars } from '@/components/shared/AnimatedRatingStars';
 
-const categories = ['Restaurant', 'Attraction', 'Hidden Gem', 'Cafe', 'Museum', 'Nature'];
 const vibeTags = ['Must Visit', 'Instagram Worthy', 'Budget Friendly', 'Family Friendly', 'Romantic', 'Local Favorite'];
 
 interface RatingState {
@@ -13,10 +14,23 @@ interface RatingState {
   crowdLevel: number;
 }
 
-const ratingLabels = (rating: number) => (rating > 0 ? `${rating}/5 ⭐` : 'Not rated');
+interface PlaceResult {
+  id: string;
+  name: string;
+  cityName: string;
+  countryName: string;
+  category: string;
+}
+
+const ratingLabels = (rating: number) => (rating > 0 ? `${rating}/5` : 'Not rated');
 
 export function ReviewForm() {
-  const [selectedCategory, setSelectedCategory] = useState('Restaurant');
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [placeSearch, setPlaceSearch] = useState('');
+  const [placeResults, setPlaceResults] = useState<PlaceResult[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [visitDate, setVisitDate] = useState('');
   const [ratings, setRatings] = useState<RatingState>({
     overall: 0,
@@ -27,10 +41,44 @@ export function ReviewForm() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [photos, setPhotos] = useState<{ id: number; url: string; name: string }[]>([]);
   const [reviewText, setReviewText] = useState('');
+  const [title, setTitle] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isValid = ratings.overall > 0 && reviewText.length >= 10 && visitDate !== '';
+  const isValid = ratings.overall > 0 && reviewText.length >= 10 && selectedPlace !== null;
+
+  // Debounced place search
+  useEffect(() => {
+    if (placeSearch.length < 2) {
+      setPlaceResults([]);
+      return;
+    }
+    setSearchLoading(true);
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/places?search=${encodeURIComponent(placeSearch)}&pageSize=5`);
+        if (res.ok) {
+          const data = await res.json();
+          setPlaceResults(
+            (data.items || []).map((p: PlaceResult) => ({
+              id: p.id,
+              name: p.name,
+              cityName: p.cityName,
+              countryName: p.countryName,
+              category: p.category,
+            }))
+          );
+        }
+      } catch {
+        // ignore
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [placeSearch]);
 
   const handleRate = (category: keyof RatingState, value: number) => {
     setRatings((prev) => ({ ...prev, [category]: value }));
@@ -62,40 +110,50 @@ export function ReviewForm() {
     setPhotos((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const handleSubmit = () => {
-    if (!isValid) return;
-    setSubmitted(true);
+  const handleSubmit = async () => {
+    if (!isValid || !selectedPlace) return;
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          placeId: selectedPlace.id,
+          overallRating: ratings.overall,
+          valueRating: ratings.value || undefined,
+          authenticityRating: ratings.authenticity || undefined,
+          crowdRating: ratings.crowdLevel || undefined,
+          title: title.trim() || undefined,
+          content: reviewText,
+          visitedAt: visitDate ? new Date(visitDate).toISOString() : undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error?.message || 'Failed to submit review');
+      }
+
+      setSubmitted(true);
+      queryClient.invalidateQueries({ queryKey: ['myReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+
+      // Redirect to profile after a moment
+      setTimeout(() => router.push('/profile'), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const ratingCards = [
-    {
-      key: 'overall' as const,
-      emoji: '✨',
-      label: 'Overall Experience',
-      subtitle: 'How was it overall?',
-      bg: 'bg-gradient-to-r from-yellow-50 to-orange-50',
-    },
-    {
-      key: 'value' as const,
-      emoji: '💰',
-      label: 'Value for Money',
-      subtitle: 'Worth the price?',
-      bg: 'bg-gradient-to-r from-green-50 to-emerald-50',
-    },
-    {
-      key: 'authenticity' as const,
-      emoji: '🌟',
-      label: 'Authenticity',
-      subtitle: 'Genuine local experience?',
-      bg: 'bg-gradient-to-r from-blue-50 to-indigo-50',
-    },
-    {
-      key: 'crowdLevel' as const,
-      emoji: '👥',
-      label: 'Crowd Level',
-      subtitle: 'How busy was it? (lower is better)',
-      bg: 'bg-gradient-to-r from-purple-50 to-pink-50',
-    },
+    { key: 'overall' as const, emoji: '✨', label: 'Overall Experience', subtitle: 'How was it overall?', bg: 'bg-gradient-to-r from-yellow-50 to-orange-50' },
+    { key: 'value' as const, emoji: '💰', label: 'Value for Money', subtitle: 'Worth the price?', bg: 'bg-gradient-to-r from-green-50 to-emerald-50' },
+    { key: 'authenticity' as const, emoji: '🌟', label: 'Authenticity', subtitle: 'Genuine local experience?', bg: 'bg-gradient-to-r from-blue-50 to-indigo-50' },
+    { key: 'crowdLevel' as const, emoji: '👥', label: 'Crowd Level', subtitle: 'How busy was it? (lower is better)', bg: 'bg-gradient-to-r from-purple-50 to-pink-50' },
   ];
 
   const todayStr = new Date().toISOString().split('T')[0];
@@ -110,41 +168,89 @@ export function ReviewForm() {
             <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-tr from-transparent via-white/30 to-transparent animate-shimmer" />
           </div>
           <div className="flex-1">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Share Your Adventure! 🚀</h1>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Share Your Adventure!</h1>
             <p className="text-lg text-gray-600 mb-3">Help fellow pioneers discover amazing places</p>
-            <div className="flex items-center gap-3 text-purple-600 bg-purple-50 px-4 py-2 rounded-full inline-flex">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span className="font-semibold">Café de Flore, Paris, France</span>
-            </div>
+            {selectedPlace && (
+              <div className="flex items-center gap-3 text-purple-600 bg-purple-50 px-4 py-2 rounded-full inline-flex">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="font-semibold">
+                  {selectedPlace.name}, {selectedPlace.cityName}, {selectedPlace.countryName}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Main Form */}
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 space-y-8 animate-slide-up">
-        {/* Category Selection */}
+        {/* Place Search */}
         <div>
           <h2 className="text-2xl font-bold mb-4 gradient-text-135 flex items-center gap-2">
-            <span>🎭</span> What type of place is this?
+            <span>📍</span> Which place are you reviewing?
           </h2>
-          <div className="flex flex-wrap gap-3">
-            {categories.map((cat) => (
+          {selectedPlace ? (
+            <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-2xl">
+              <div className="flex-1">
+                <p className="font-bold text-gray-800">{selectedPlace.name}</p>
+                <p className="text-sm text-gray-600">{selectedPlace.cityName}, {selectedPlace.countryName}</p>
+              </div>
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-6 py-3 rounded-full text-base font-bold transition-all duration-300 hover:-translate-y-0.5 ${
-                  selectedCategory === cat
-                    ? 'bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white shadow-[0_8px_25px_rgba(102,126,234,0.4)] scale-105'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md'
-                }`}
+                onClick={() => { setSelectedPlace(null); setPlaceSearch(''); }}
+                className="text-gray-400 hover:text-gray-600 px-3 py-1 rounded-full hover:bg-white"
               >
-                {cat}
+                Change
               </button>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className="relative">
+              <input
+                type="text"
+                value={placeSearch}
+                onChange={(e) => setPlaceSearch(e.target.value)}
+                placeholder="Search for a place..."
+                className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/10 text-lg transition-all"
+              />
+              {searchLoading && (
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">Searching...</div>
+              )}
+              {placeResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl z-10 max-h-60 overflow-y-auto">
+                  {placeResults.map((place) => (
+                    <button
+                      key={place.id}
+                      onClick={() => {
+                        setSelectedPlace(place);
+                        setPlaceSearch('');
+                        setPlaceResults([]);
+                      }}
+                      className="w-full text-left px-5 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0"
+                    >
+                      <p className="font-semibold text-gray-800">{place.name}</p>
+                      <p className="text-sm text-gray-500">{place.cityName}, {place.countryName}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Title (optional) */}
+        <div>
+          <h2 className="text-2xl font-bold mb-4 gradient-text-135 flex items-center gap-2">
+            <span>📝</span> Review Title (optional)
+          </h2>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Give your review a catchy title..."
+            className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-500/10 text-lg transition-all"
+          />
         </div>
 
         {/* Visit Date */}
@@ -166,7 +272,6 @@ export function ReviewForm() {
           <h2 className="text-2xl font-bold mb-4 gradient-text-135 flex items-center gap-2">
             <span>⭐</span> Rate Your Experience
           </h2>
-
           {ratingCards.map((card) => (
             <div key={card.key} className={`${card.bg} rounded-2xl p-6 shadow-md border-l-4 border-transparent hover:border-l-[#667eea] hover:translate-x-1 transition-all`}>
               <div className="flex items-center justify-between mb-3">
@@ -263,7 +368,7 @@ export function ReviewForm() {
           <textarea
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
-            placeholder="What made this place special? Any insider tips for fellow pioneers? Share the magic! ✨"
+            placeholder="What made this place special? Any insider tips for fellow pioneers? Share the magic!"
             rows={6}
             className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 resize-none text-lg transition-all"
           />
@@ -272,7 +377,7 @@ export function ReviewForm() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>
-              {reviewText.length} characters {reviewText.length < 10 ? '(minimum 10 to submit)' : '✅'}
+              {reviewText.length} characters {reviewText.length < 10 ? '(minimum 10 to submit)' : ''}
             </span>
           </div>
         </div>
@@ -280,9 +385,14 @@ export function ReviewForm() {
 
       {/* Submit Button */}
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 animate-slide-up">
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm mb-4">
+            {error}
+          </div>
+        )}
         <button
           onClick={handleSubmit}
-          disabled={!isValid}
+          disabled={!isValid || isSubmitting}
           className={`w-full py-6 rounded-2xl font-bold text-2xl transition-all relative overflow-hidden ${
             submitted
               ? 'text-white'
@@ -300,15 +410,17 @@ export function ReviewForm() {
         >
           <span className="relative z-10">
             {submitted
-              ? '✅ Review Submitted! Thank you!'
+              ? 'Review Submitted! Thank you!'
+              : isSubmitting
+              ? 'Submitting...'
               : isValid
-              ? 'Share Your Experience! 🚀✨'
-              : 'Complete the required fields ⬆️'}
+              ? 'Share Your Experience!'
+              : 'Complete the required fields'}
           </span>
         </button>
         {isValid && !submitted && (
           <p className="text-center text-lg text-gray-600 mt-4 font-medium animate-fade-in">
-            🎉 Your review will help fellow pioneers discover amazing places!
+            Your review will help fellow pioneers discover amazing places!
           </p>
         )}
       </div>

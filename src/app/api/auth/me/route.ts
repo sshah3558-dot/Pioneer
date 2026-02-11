@@ -1,9 +1,9 @@
-// @ts-nocheck
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { MeResponse } from '@/types/api';
+import { InterestCategory, SocialPlatform } from '@/types/user';
 
 export async function GET() {
   try {
@@ -56,17 +56,17 @@ export async function GET() {
         followingCount: user.followingCount,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-        interests: user.interests.map((i: { id: string; userId: string; category: string; weight: number; createdAt: Date }) => ({
+        interests: user.interests.map((i) => ({
           id: i.id,
           userId: i.userId,
-          category: i.category,
+          category: i.category as InterestCategory,
           weight: i.weight,
           createdAt: i.createdAt,
         })),
-        socialConnections: user.socialConnections.map((sc: { id: string; userId: string; platform: string; connectedAt: Date; expiresAt: Date | null }) => ({
+        socialConnections: user.socialConnections.map((sc) => ({
           id: sc.id,
           userId: sc.userId,
-          platform: sc.platform,
+          platform: sc.platform as SocialPlatform,
           connectedAt: sc.connectedAt,
           expiresAt: sc.expiresAt,
         })),

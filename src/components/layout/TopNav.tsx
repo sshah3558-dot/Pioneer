@@ -1,7 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import { LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -20,6 +23,12 @@ const navItems: NavItem[] = [
 
 export function TopNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const [showMenu, setShowMenu] = useState(false);
+
+  const avatarUrl =
+    session?.user?.image ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(session?.user?.name || 'U')}&background=667eea&color=fff`;
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-purple-500 hidden md:block">
@@ -55,21 +64,44 @@ export function TopNav() {
             })}
           </div>
 
-          {/* Right side: notification bell + avatar */}
+          {/* Right side: notification bell + avatar dropdown */}
           <div className="flex items-center gap-4">
             <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
               <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
-              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
-                3
-              </span>
             </button>
-            <img
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
-              alt="User avatar"
-              className="w-10 h-10 rounded-full border-2 border-purple-500 object-cover"
-            />
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="focus:outline-none"
+              >
+                <img
+                  src={avatarUrl}
+                  alt="User avatar"
+                  className="w-10 h-10 rounded-full border-2 border-purple-500 object-cover"
+                />
+              </button>
+              {showMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="font-semibold text-sm text-gray-900 truncate">
+                      {session?.user?.name}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {session?.user?.email}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/login' })}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

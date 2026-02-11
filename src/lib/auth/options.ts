@@ -37,6 +37,8 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           image: user.avatarUrl,
+          username: user.username,
+          onboardingComplete: user.onboardingComplete,
         };
       },
     }),
@@ -53,21 +55,36 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
+        token.username = user.username;
+        token.onboardingComplete = user.onboardingComplete;
+      }
+      // Refresh onboarding status when session is updated
+      if (trigger === 'update') {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id },
+          select: { onboardingComplete: true, username: true },
+        });
+        if (dbUser) {
+          token.onboardingComplete = dbUser.onboardingComplete;
+          token.username = dbUser.username;
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
+        session.user.id = token.id;
+        session.user.username = token.username;
+        session.user.onboardingComplete = token.onboardingComplete;
       }
       return session;
     },
   },
   pages: {
-    signIn: '/auth/login',
-    error: '/auth/error',
+    signIn: '/login',
+    error: '/login',
   },
 };

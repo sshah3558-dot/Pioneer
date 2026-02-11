@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { z } from 'zod';
@@ -6,6 +5,88 @@ import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { updatePlaceRatings } from '@/lib/services/reviews';
 import { CreateReviewResponse } from '@/types/api';
+
+// GET /api/reviews - List reviews (by userId or placeId)
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+    const placeId = searchParams.get('placeId');
+    const page = parseInt(searchParams.get('page') || '1');
+    const pageSize = parseInt(searchParams.get('pageSize') || '10');
+
+    const where: Record<string, unknown> = {};
+
+    if (userId === 'me') {
+      if (!session?.user?.email) {
+        return NextResponse.json(
+          { error: { message: 'Not authenticated', code: 'UNAUTHORIZED' } },
+          { status: 401 }
+        );
+      }
+      const currentUser = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: { id: true },
+      });
+      if (!currentUser) {
+        return NextResponse.json(
+          { error: { message: 'User not found', code: 'NOT_FOUND' } },
+          { status: 404 }
+        );
+      }
+      where.userId = currentUser.id;
+    } else if (userId) {
+      where.userId = userId;
+    }
+
+    if (placeId) {
+      where.placeId = placeId;
+    }
+
+    const [items, total] = await Promise.all([
+      prisma.review.findMany({
+        where,
+        include: {
+          user: {
+            select: { id: true, name: true, username: true, avatarUrl: true },
+          },
+          place: {
+            select: {
+              id: true,
+              name: true,
+              imageUrl: true,
+              city: {
+                select: {
+                  name: true,
+                  country: { select: { name: true } },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.review.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      items,
+      total,
+      page,
+      pageSize,
+      hasMore: page * pageSize < total,
+    });
+  } catch (error) {
+    console.error('GET /api/reviews error:', error);
+    return NextResponse.json(
+      { error: { message: 'Internal server error', code: 'INTERNAL_ERROR' } },
+      { status: 500 }
+    );
+  }
+}
 
 const createReviewSchema = z.object({
   placeId: z.string().min(1, 'Place ID is required'),

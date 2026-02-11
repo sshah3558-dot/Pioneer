@@ -1,9 +1,9 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { GetUserResponse } from '@/types/api';
+import { InterestCategory, SocialPlatform } from '@/types/user';
 
 type Params = Promise<{ username: string }>;
 
@@ -80,14 +80,14 @@ export async function GET(
         interests: user.interests.map((i) => ({
           id: i.id,
           userId: i.userId,
-          category: i.category,
+          category: i.category as InterestCategory,
           weight: i.weight,
           createdAt: i.createdAt,
         })),
         socialConnections: user.socialConnections.map((sc) => ({
           id: sc.id,
           userId: sc.userId,
-          platform: sc.platform,
+          platform: sc.platform as SocialPlatform,
           connectedAt: sc.connectedAt,
           expiresAt: sc.expiresAt,
         })),

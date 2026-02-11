@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { GradientButton } from '@/components/shared/GradientButton';
@@ -32,13 +33,20 @@ export function LoginForm() {
     setError('');
 
     try {
-      // Simulate API call - replace with actual API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
 
-      // For demo purposes, redirect to feed
-      router.push('/feed');
+      if (result?.error) {
+        setError('Invalid email or password. Please try again.');
+      } else {
+        router.push('/feed');
+        router.refresh();
+      }
     } catch {
-      setError('Invalid email or password. Please try again.');
+      setError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +136,7 @@ export function LoginForm() {
       {/* Google OAuth */}
       <button
         type="button"
+        onClick={() => signIn('google', { callbackUrl: '/feed' })}
         className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
