@@ -5,11 +5,21 @@ import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { GetFeedResponse, FeedItem } from '@/types/api';
 import { TripStatus } from '@/types/trip';
+import { PlaceCategory, PriceLevel } from '@/types/place';
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
   pageSize: z.coerce.number().max(50).default(20),
 });
+
+const userSelect = {
+  id: true,
+  name: true,
+  username: true,
+  avatarUrl: true,
+  tripCount: true,
+  followerCount: true,
+};
 
 // GET /api/feed - Get activity feed from followed users
 export async function GET(request: NextRequest) {
@@ -59,26 +69,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(response);
     }
 
-    // Get public trips from followed users
-    const where = {
-      userId: { in: followingIds },
-      isPublic: true,
-    };
-
-    const [trips, total] = await Promise.all([
+    // Query all four activity types in parallel
+    const [trips, reviews, follows, posts] = await Promise.all([
+      // 1. Public trips from followed users
       prisma.trip.findMany({
-        where,
+        where: {
+          userId: { in: followingIds },
+          isPublic: true,
+        },
         include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              avatarUrl: true,
-              tripCount: true,
-              followerCount: true,
-            },
-          },
+          user: { select: userSelect },
           city: {
             include: {
               country: true,
@@ -88,24 +88,48 @@ export async function GET(request: NextRequest) {
             select: { stops: true },
           },
         },
-        skip: (query.page - 1) * query.pageSize,
-        take: query.pageSize,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.trip.count({ where }),
+
+      // 2. Reviews from followed users
+      prisma.review.findMany({
+        where: {
+          userId: { in: followingIds },
+        },
+        include: {
+          user: { select: userSelect },
+          place: { include: { city: { include: { country: true } } } },
+          _count: { select: { photos: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+
+      // 3. Follow activity from followed users (when they follow someone)
+      prisma.follow.findMany({
+        where: {
+          followerId: { in: followingIds },
+        },
+        include: {
+          follower: { select: userSelect },
+          following: { select: userSelect },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+
+      // 4. Posts from followed users
+      prisma.post.findMany({
+        where: {
+          userId: { in: followingIds },
+        },
+        include: {
+          user: { select: userSelect },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
     ]);
 
-    // Check liked status
-    const likes = await prisma.tripLike.findMany({
-      where: {
-        userId: currentUser.id,
-        tripId: { in: trips.map(t => t.id) },
-      },
-      select: { tripId: true },
-    });
-    const likedIds = new Set(likes.map(l => l.tripId));
-
-    const items: FeedItem[] = trips.map(trip => ({
+    // Build FeedItem objects for each type
+    const tripItems: FeedItem[] = trips.map(trip => ({
       id: `trip-${trip.id}`,
       type: 'trip' as const,
       createdAt: trip.createdAt.toISOString(),
@@ -123,16 +147,102 @@ export async function GET(request: NextRequest) {
           country: { name: trip.city.country.name },
         },
         stopCount: trip._count.stops,
-        isLiked: likedIds.has(trip.id),
+        isLiked: false, // Will be enriched below
       },
     }));
 
+    const reviewItems: FeedItem[] = reviews.map(review => ({
+      id: `review-${review.id}`,
+      type: 'review' as const,
+      createdAt: review.createdAt.toISOString(),
+      review: {
+        id: review.id,
+        user: review.user,
+        place: {
+          id: review.place.id,
+          name: review.place.name,
+          category: review.place.category as PlaceCategory,
+          imageUrl: review.place.imageUrl,
+          neighborhood: review.place.neighborhood,
+          avgOverallRating: review.place.avgOverallRating,
+          totalReviewCount: review.place.totalReviewCount,
+          priceLevel: review.place.priceLevel as PriceLevel | null,
+          tags: [],
+          isSaved: false,
+          cityName: review.place.city.name,
+          countryName: review.place.city.country.name,
+        },
+        overallRating: review.overallRating,
+        title: review.title,
+        content: review.content,
+        photoCount: review._count.photos,
+        likeCount: review.likeCount,
+        isLiked: false,
+        createdAt: review.createdAt,
+      },
+    }));
+
+    const followItems: FeedItem[] = follows.map(follow => ({
+      id: `follow-${follow.id}`,
+      type: 'follow' as const,
+      createdAt: follow.createdAt.toISOString(),
+      follow: {
+        follower: follow.follower,
+        following: follow.following,
+      },
+    }));
+
+    const postItems: FeedItem[] = posts.map(post => ({
+      id: `post-${post.id}`,
+      type: 'post' as const,
+      createdAt: post.createdAt.toISOString(),
+      post: {
+        id: post.id,
+        content: post.content,
+        imageUrl: post.imageUrl,
+        likeCount: post.likeCount,
+        user: post.user,
+        createdAt: post.createdAt.toISOString(),
+      },
+    }));
+
+    // Merge all items and sort by createdAt descending
+    const allItems = [...tripItems, ...reviewItems, ...followItems, ...postItems];
+    allItems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    // Paginate the merged results
+    const total = allItems.length;
+    const start = (query.page - 1) * query.pageSize;
+    const paginatedItems = allItems.slice(start, start + query.pageSize);
+
+    // Enrich trip items with like status for the current user
+    const tripIdsInPage = paginatedItems
+      .filter(item => item.type === 'trip' && item.trip)
+      .map(item => item.trip!.id);
+
+    if (tripIdsInPage.length > 0) {
+      const likes = await prisma.tripLike.findMany({
+        where: {
+          userId: currentUser.id,
+          tripId: { in: tripIdsInPage },
+        },
+        select: { tripId: true },
+      });
+      const likedIds = new Set(likes.map(l => l.tripId));
+
+      for (const item of paginatedItems) {
+        if (item.type === 'trip' && item.trip) {
+          item.trip.isLiked = likedIds.has(item.trip.id);
+        }
+      }
+    }
+
     const response: GetFeedResponse = {
-      items,
+      items: paginatedItems,
       total,
       page: query.page,
       pageSize: query.pageSize,
-      hasMore: query.page * query.pageSize < total,
+      hasMore: start + query.pageSize < total,
     };
 
     return NextResponse.json(response);

@@ -7,6 +7,8 @@ import { GetPlacesResponse } from '@/types/api';
 import { PlaceCard, PlaceCategory, PriceLevel } from '@/types/place';
 import { Prisma } from '@prisma/client';
 
+const VALID_PRICE_LEVELS: PriceLevel[] = ['FREE', 'BUDGET', 'MODERATE', 'EXPENSIVE', 'LUXURY'];
+
 const VALID_CATEGORIES: PlaceCategory[] = [
   'RESTAURANT', 'CAFE', 'BAR', 'NIGHTCLUB', 'MUSEUM', 'GALLERY',
   'MONUMENT', 'LANDMARK', 'PARK', 'BEACH', 'VIEWPOINT', 'MARKET',
@@ -191,6 +193,106 @@ export async function GET(request: NextRequest) {
       );
     }
     console.error('GET /api/places error:', error);
+    return NextResponse.json(
+      { error: { message: 'Internal server error', code: 'INTERNAL_ERROR' } },
+      { status: 500 }
+    );
+  }
+}
+
+// ============================================
+// POST /api/places - Create a new place
+// ============================================
+
+const createPlaceSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(200),
+  category: z.string().refine(
+    (val) => VALID_CATEGORIES.includes(val as PlaceCategory),
+    { message: 'Invalid category' }
+  ),
+  cityId: z.string().min(1, 'City is required'),
+  address: z.string().min(1, 'Address is required'),
+  description: z.string().max(2000).optional(),
+  priceLevel: z.string().refine(
+    (val) => VALID_PRICE_LEVELS.includes(val as PriceLevel),
+    { message: 'Invalid price level' }
+  ).optional(),
+  latitude: z.coerce.number().default(0),
+  longitude: z.coerce.number().default(0),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: { message: 'Not authenticated', code: 'UNAUTHORIZED' } },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const data = createPlaceSchema.parse(body);
+
+    // Get current user
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: { message: 'User not found', code: 'NOT_FOUND' } },
+        { status: 404 }
+      );
+    }
+
+    // Verify city exists
+    const city = await prisma.city.findUnique({
+      where: { id: data.cityId },
+      select: { id: true },
+    });
+
+    if (!city) {
+      return NextResponse.json(
+        { error: { message: 'City not found', code: 'NOT_FOUND' } },
+        { status: 404 }
+      );
+    }
+
+    // Create the place
+    const place = await prisma.place.create({
+      data: {
+        name: data.name,
+        category: data.category as PlaceCategory,
+        cityId: data.cityId,
+        address: data.address,
+        description: data.description || null,
+        priceLevel: (data.priceLevel as PriceLevel) || null,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        createdById: user.id,
+      },
+      include: {
+        city: {
+          include: {
+            country: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({
+      place,
+    }, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: { message: error.issues[0].message, code: 'VALIDATION_ERROR' } },
+        { status: 400 }
+      );
+    }
+    console.error('POST /api/places error:', error);
     return NextResponse.json(
       { error: { message: 'Internal server error', code: 'INTERNAL_ERROR' } },
       { status: 500 }
