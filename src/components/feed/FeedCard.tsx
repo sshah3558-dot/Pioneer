@@ -51,6 +51,12 @@ export function FeedCard({ activity, className }: FeedCardProps) {
     if (activity.type === 'place_saved' && activity.place) {
       return `Saved ${activity.place.name} to their travel list. Located in ${activity.place.neighborhood || activity.place.cityName}.`;
     }
+    if (activity.type === 'follow' && activity.follow) {
+      return `Started following ${activity.follow.following.name || activity.follow.following.username}`;
+    }
+    if (activity.type === 'post' && activity.post) {
+      return activity.post.content;
+    }
     return '';
   };
 
@@ -67,10 +73,13 @@ export function FeedCard({ activity, className }: FeedCardProps) {
   const getImage = () => {
     if (activity.trip?.coverImageUrl) return activity.trip.coverImageUrl;
     if (activity.place?.imageUrl) return activity.place.imageUrl;
+    if (activity.post?.imageUrl) return activity.post.imageUrl;
     return null;
   };
 
   const getLink = () => {
+    if (activity.type === 'follow' && activity.follow) return `/users/${activity.follow.following.username}`;
+    if (activity.type === 'post') return '#';
     if (activity.trip) return `/trips/${activity.trip.id}`;
     if (activity.place) return `/places/${activity.place.id}`;
     return '#';

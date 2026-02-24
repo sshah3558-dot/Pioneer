@@ -258,7 +258,9 @@ export type FeedActivityType =
   | 'trip_started'
   | 'review_posted'
   | 'photos_uploaded'
-  | 'place_saved';
+  | 'place_saved'
+  | 'follow'
+  | 'post';
 
 export interface FeedActivity {
   id: string;
@@ -270,6 +272,8 @@ export interface FeedActivity {
   review?: ReviewCard;
   photoCount?: number;
   rating?: number;
+  follow?: { follower: UserPreview; following: UserPreview };
+  post?: { id: string; content: string; imageUrl: string | null; likeCount: number; user: UserPreview; createdAt: string };
 }
 
 export const mockFeedActivities: FeedActivity[] = [
