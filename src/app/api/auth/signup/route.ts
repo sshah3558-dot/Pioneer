@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { hashPassword, validatePasswordStrength } from '@/lib/auth/password';
 import { SignupResponse } from '@/types/api';
+import { User } from '@/types/user';
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email format'),
@@ -75,6 +76,9 @@ export async function POST(request: NextRequest) {
         reviewCount: user.reviewCount,
         followerCount: user.followerCount,
         followingCount: user.followingCount,
+        defaultTripPublic: user.defaultTripPublic,
+        discoverable: user.discoverable,
+        notificationPrefs: user.notificationPrefs as User['notificationPrefs'],
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },

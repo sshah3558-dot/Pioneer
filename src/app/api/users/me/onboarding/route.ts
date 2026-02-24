@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { CompleteOnboardingResponse } from '@/types/api';
+import { User } from '@/types/user';
 
 // POST /api/users/me/onboarding - Complete onboarding
 export async function POST() {
@@ -36,6 +37,9 @@ export async function POST() {
         reviewCount: user.reviewCount,
         followerCount: user.followerCount,
         followingCount: user.followingCount,
+        defaultTripPublic: user.defaultTripPublic,
+        discoverable: user.discoverable,
+        notificationPrefs: user.notificationPrefs as User['notificationPrefs'],
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },

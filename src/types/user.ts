@@ -37,6 +37,16 @@ export interface User {
   followerCount: number;
   followingCount: number;
 
+  // Settings
+  defaultTripPublic: boolean;
+  discoverable: boolean;
+  notificationPrefs: {
+    emailOnFollow: boolean;
+    emailOnReviewLike: boolean;
+    emailOnTripLike: boolean;
+    emailOnForumReply: boolean;
+  } | null;
+
   createdAt: Date;
   updatedAt: Date;
 }

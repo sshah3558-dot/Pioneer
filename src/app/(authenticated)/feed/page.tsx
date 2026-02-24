@@ -15,14 +15,16 @@ export default function FeedPage() {
     queryFn: () => apiFetch<GetFeedResponse>('/api/feed'),
   });
 
-  // Convert TripCard items from API into FeedActivity format for FeedCard
-  const activities: FeedActivity[] = (data?.items || []).map((trip) => ({
-    id: trip.id,
-    type: trip.status === 'COMPLETED' ? 'trip_completed' as const : 'trip_started' as const,
-    user: trip.user,
-    timestamp: new Date(trip.startDate || Date.now()),
-    trip,
-  }));
+  // Convert FeedItem items from API into FeedActivity format for FeedCard
+  const activities: FeedActivity[] = (data?.items || [])
+    .filter((item) => item.type === 'trip' && item.trip)
+    .map((item) => ({
+      id: item.id,
+      type: item.trip!.status === 'COMPLETED' ? 'trip_completed' as const : 'trip_started' as const,
+      user: item.trip!.user,
+      timestamp: new Date(item.createdAt),
+      trip: item.trip!,
+    }));
 
   return (
     <div className="animate-fade-in">

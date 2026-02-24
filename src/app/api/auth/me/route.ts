@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { MeResponse } from '@/types/api';
-import { InterestCategory, SocialPlatform } from '@/types/user';
+import { InterestCategory, SocialPlatform, User } from '@/types/user';
 
 export async function GET() {
   try {
@@ -54,6 +54,9 @@ export async function GET() {
         reviewCount: user.reviewCount,
         followerCount: user.followerCount,
         followingCount: user.followingCount,
+        defaultTripPublic: user.defaultTripPublic,
+        discoverable: user.discoverable,
+        notificationPrefs: user.notificationPrefs as User['notificationPrefs'],
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         interests: user.interests.map((i) => ({

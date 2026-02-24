@@ -55,6 +55,9 @@ export const mockCurrentUser: UserProfile = {
   reviewCount: 47,
   followerCount: 1234,
   followingCount: 567,
+  defaultTripPublic: true,
+  discoverable: true,
+  notificationPrefs: null,
   createdAt: new Date('2023-06-15'),
   updatedAt: new Date('2024-01-15'),
   interests: [

@@ -3,8 +3,8 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
-import { GetFeedResponse } from '@/types/api';
-import { TripCard, TripStatus } from '@/types/trip';
+import { GetFeedResponse, FeedItem } from '@/types/api';
+import { TripStatus } from '@/types/trip';
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
@@ -105,21 +105,26 @@ export async function GET(request: NextRequest) {
     });
     const likedIds = new Set(likes.map(l => l.tripId));
 
-    const items: TripCard[] = trips.map(trip => ({
-      id: trip.id,
-      title: trip.title,
-      coverImageUrl: trip.coverImageUrl,
-      startDate: trip.startDate,
-      endDate: trip.endDate,
-      likeCount: trip.likeCount,
-      status: trip.status as TripStatus,
-      user: trip.user,
-      city: {
-        name: trip.city.name,
-        country: { name: trip.city.country.name },
+    const items: FeedItem[] = trips.map(trip => ({
+      id: `trip-${trip.id}`,
+      type: 'trip' as const,
+      createdAt: trip.createdAt.toISOString(),
+      trip: {
+        id: trip.id,
+        title: trip.title,
+        coverImageUrl: trip.coverImageUrl,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        likeCount: trip.likeCount,
+        status: trip.status as TripStatus,
+        user: trip.user,
+        city: {
+          name: trip.city.name,
+          country: { name: trip.city.country.name },
+        },
+        stopCount: trip._count.stops,
+        isLiked: likedIds.has(trip.id),
       },
-      stopCount: trip._count.stops,
-      isLiked: likedIds.has(trip.id),
     }));
 
     const response: GetFeedResponse = {

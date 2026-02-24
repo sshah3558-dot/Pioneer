@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { MeResponse, UpdateUserRequest } from '@/types/api';
-import { InterestCategory, SocialPlatform } from '@/types/user';
+import { InterestCategory, SocialPlatform, User } from '@/types/user';
 
 // GET /api/users/me - Get current user profile
 export async function GET() {
@@ -56,6 +56,9 @@ export async function GET() {
         reviewCount: user.reviewCount,
         followerCount: user.followerCount,
         followingCount: user.followingCount,
+        defaultTripPublic: user.defaultTripPublic,
+        discoverable: user.discoverable,
+        notificationPrefs: user.notificationPrefs as User['notificationPrefs'],
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         interests: user.interests.map((i) => ({
@@ -162,6 +165,9 @@ export async function PATCH(request: NextRequest) {
         reviewCount: user.reviewCount,
         followerCount: user.followerCount,
         followingCount: user.followingCount,
+        defaultTripPublic: user.defaultTripPublic,
+        discoverable: user.discoverable,
+        notificationPrefs: user.notificationPrefs as User['notificationPrefs'],
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         interests: user.interests.map((i) => ({

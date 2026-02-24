@@ -247,7 +247,19 @@ export interface GetFeedRequest {
   pageSize?: number;
 }
 
-export interface GetFeedResponse extends PaginatedResponse<TripCard> {}
+export type FeedItemType = 'trip' | 'review' | 'follow' | 'post';
+
+export interface FeedItem {
+  id: string;
+  type: FeedItemType;
+  createdAt: string;
+  trip?: TripCard;
+  review?: ReviewCard;
+  follow?: { follower: UserPreview; following: UserPreview };
+  post?: { id: string; content: string; imageUrl: string | null; likeCount: number; user: UserPreview; createdAt: string };
+}
+
+export interface GetFeedResponse extends PaginatedResponse<FeedItem> {}
 
 // GET /api/recommendations
 // Personalized place recommendations based on trips from similar users
@@ -383,4 +395,44 @@ export interface SearchResponse {
   places?: PlaceCard[];
   trips?: TripCard[];
   users?: UserPreview[];
+}
+
+// ============================================
+// POST ENDPOINTS
+// ============================================
+
+// POST /api/posts
+export interface CreatePostRequest {
+  content: string;
+  imageUrl?: string;
+}
+
+export interface CreatePostResponse {
+  post: { id: string; content: string; imageUrl: string | null; likeCount: number; createdAt: string };
+}
+
+// POST /api/upload
+export interface UploadResponse {
+  url: string;
+}
+
+// ============================================
+// ACCOUNT MANAGEMENT ENDPOINTS
+// ============================================
+
+// PATCH /api/users/me/email
+export interface ChangeEmailRequest {
+  newEmail: string;
+  currentPassword: string;
+}
+
+// PATCH /api/users/me/password
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+// DELETE /api/users/me
+export interface DeleteAccountRequest {
+  confirmUsername: string;
 }

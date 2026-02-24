@@ -31,6 +31,11 @@ model User {
   followerCount      Int       @default(0)
   followingCount     Int       @default(0)
 
+  // Settings
+  defaultTripPublic  Boolean  @default(true)
+  discoverable       Boolean  @default(true)
+  notificationPrefs  Json?    // { emailOnFollow, emailOnReviewLike, emailOnTripLike, emailOnForumReply }
+
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -55,6 +60,7 @@ model User {
   // Forum relations
   forumPosts         ForumPost[]
   forumComments      ForumComment[]
+  posts              Post[]
 
   // Likes
   reviewLikes        ReviewLike[]
@@ -454,6 +460,26 @@ model TripLike {
 
   @@unique([userId, tripId])
   @@map("trip_likes")
+}
+
+// ============================================
+// POSTS (Feed Posts)
+// ============================================
+
+model Post {
+  id        String   @id @default(cuid())
+  userId    String
+  content   String   @db.Text
+  imageUrl  String?
+  likeCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("posts")
 }
 
 // ============================================
