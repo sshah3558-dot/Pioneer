@@ -74,6 +74,14 @@ export interface UpdateUserRequest {
   bio?: string;
   avatarUrl?: string;
   coverImageUrl?: string;
+  defaultTripPublic?: boolean;
+  discoverable?: boolean;
+  notificationPrefs?: {
+    emailOnFollow: boolean;
+    emailOnReviewLike: boolean;
+    emailOnTripLike: boolean;
+    emailOnForumReply: boolean;
+  };
 }
 
 // GET /api/users/me/interests

@@ -94,6 +94,14 @@ const updateUserSchema = z.object({
   bio: z.string().max(500).optional(),
   avatarUrl: z.string().url().optional().nullable(),
   coverImageUrl: z.string().url().optional().nullable(),
+  defaultTripPublic: z.boolean().optional(),
+  discoverable: z.boolean().optional(),
+  notificationPrefs: z.object({
+    emailOnFollow: z.boolean(),
+    emailOnReviewLike: z.boolean(),
+    emailOnTripLike: z.boolean(),
+    emailOnForumReply: z.boolean(),
+  }).optional(),
 });
 
 // PATCH /api/users/me - Update current user profile
@@ -135,6 +143,9 @@ export async function PATCH(request: NextRequest) {
         ...(data.bio !== undefined && { bio: data.bio }),
         ...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
         ...(data.coverImageUrl !== undefined && { coverImageUrl: data.coverImageUrl }),
+        ...(data.defaultTripPublic !== undefined && { defaultTripPublic: data.defaultTripPublic }),
+        ...(data.discoverable !== undefined && { discoverable: data.discoverable }),
+        ...(data.notificationPrefs !== undefined && { notificationPrefs: data.notificationPrefs }),
       },
       include: {
         interests: true,

@@ -1,7 +1,7 @@
 import { getToken } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
 
-const protectedRoutes = ['/feed', '/explore', '/planner', '/forums', '/profile', '/reviews'];
+const protectedRoutes = ['/feed', '/explore', '/planner', '/forums', '/profile', '/reviews', '/settings'];
 const authRoutes = ['/login', '/signup'];
 
 export async function middleware(request: NextRequest) {
@@ -42,6 +42,7 @@ export const config = {
     '/forums/:path*',
     '/profile/:path*',
     '/reviews/:path*',
+    '/settings/:path*',
     '/login',
     '/signup',
     '/onboarding',
