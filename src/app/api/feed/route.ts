@@ -57,24 +57,15 @@ export async function GET(request: NextRequest) {
 
     const followingIds = following.map(f => f.followingId);
 
-    // If not following anyone, return empty feed
-    if (followingIds.length === 0) {
-      const response: GetFeedResponse = {
-        items: [],
-        total: 0,
-        page: query.page,
-        pageSize: query.pageSize,
-        hasMore: false,
-      };
-      return NextResponse.json(response);
-    }
+    // Include current user + followed users for feed content
+    const feedUserIds = [currentUser.id, ...followingIds];
 
     // Query all four activity types in parallel
     const [trips, reviews, follows, posts] = await Promise.all([
-      // 1. Public trips from followed users
+      // 1. Public trips from feed users
       prisma.trip.findMany({
         where: {
-          userId: { in: followingIds },
+          userId: { in: feedUserIds },
           isPublic: true,
         },
         include: {
@@ -91,10 +82,10 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
       }),
 
-      // 2. Reviews from followed users
+      // 2. Reviews from feed users
       prisma.review.findMany({
         where: {
-          userId: { in: followingIds },
+          userId: { in: feedUserIds },
         },
         include: {
           user: { select: userSelect },
@@ -116,10 +107,10 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
       }),
 
-      // 4. Posts from followed users
+      // 4. Posts from feed users (own + followed)
       prisma.post.findMany({
         where: {
-          userId: { in: followingIds },
+          userId: { in: feedUserIds },
         },
         include: {
           user: { select: userSelect },

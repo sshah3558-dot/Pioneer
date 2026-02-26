@@ -21,6 +21,18 @@ export default function ProfilePage() {
     enabled: !!user,
   });
 
+  const { data: postsData } = useQuery({
+    queryKey: ['myPosts'],
+    queryFn: () => apiFetch<{ items: Array<{
+      id: string;
+      content: string;
+      imageUrl: string | null;
+      likeCount: number;
+      createdAt: string;
+    }> }>('/api/posts?userId=me'),
+    enabled: !!user,
+  });
+
   if (userLoading) {
     return (
       <div className="space-y-6 animate-fade-in">
@@ -38,6 +50,7 @@ export default function ProfilePage() {
   if (!user) return null;
 
   const reviews = reviewsData?.items || [];
+  const posts = postsData?.items || [];
 
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
@@ -76,6 +89,36 @@ export default function ProfilePage() {
                   {review.place.city.name}, {review.place.city.country.name}
                 </p>
                 <p className="text-sm text-gray-700 line-clamp-3">{review.content}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* My Posts */}
+      <h3 className="font-bold text-2xl gradient-text-135">My Posts</h3>
+      {posts.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+          <p className="text-gray-500 text-lg">No posts yet.</p>
+          <p className="text-gray-400 text-sm mt-1">Share your latest discovery on the feed!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => (
+            <div key={post.id} className="card-hover bg-white rounded-2xl shadow-lg overflow-hidden">
+              {post.imageUrl && (
+                <img src={post.imageUrl} alt="" className="w-full h-48 object-cover" />
+              )}
+              <div className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-gray-500">{timeAgo(post.createdAt)}</span>
+                  {post.likeCount > 0 && (
+                    <span className="bg-pink-100 text-pink-800 px-2 py-1 rounded-full text-xs font-bold">
+                      {post.likeCount} likes
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-700 line-clamp-4">{post.content}</p>
               </div>
             </div>
           ))}
