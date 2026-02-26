@@ -38,7 +38,7 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden card-hover">
       {/* Image with score badge */}
       <div className="relative">
         {moment.imageUrl ? (
@@ -82,14 +82,14 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
             alt=""
             className="w-6 h-6 rounded-full object-cover"
           />
-          <span className="text-sm font-medium text-gray-900 truncate">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
             {moment.user.name || moment.user.username || 'Anonymous'}
           </span>
         </div>
 
         {/* Place info */}
         {moment.place && (
-          <p className="text-xs text-gray-500 flex items-center gap-1 mb-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mb-1">
             <MapPin className="w-3 h-3" />
             {moment.place.name}
             {moment.place.cityName && `, ${moment.place.cityName}`}
@@ -97,11 +97,11 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
         )}
 
         {/* Content preview */}
-        <p className="text-sm text-gray-700 line-clamp-2">{moment.content}</p>
+        <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{moment.content}</p>
 
         {/* View count */}
         {moment.viewCount > 0 && (
-          <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 flex items-center gap-1">
             <Eye className="w-3 h-3" />
             {moment.viewCount} views
           </p>

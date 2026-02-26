@@ -77,7 +77,7 @@ export default function FeedPage() {
 
           {!isLoading && activities.length > 0 && (
             <div className="text-center py-4">
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
                 You&apos;re all caught up! Check back later for more updates.
               </p>
             </div>

@@ -46,20 +46,20 @@ export default function PlannerPage() {
           {isLoading ? (
             <div className="space-y-6">
               {[1, 2].map((i) => (
-                <div key={i} className="bg-white rounded-2xl shadow-lg p-6 animate-pulse">
-                  <div className="h-6 bg-gray-200 rounded w-20 mb-4" />
-                  <div className="h-8 bg-gray-200 rounded w-48 mb-2" />
-                  <div className="h-4 bg-gray-200 rounded w-32 mb-4" />
-                  <div className="h-12 bg-gray-200 rounded mb-4" />
-                  <div className="h-12 bg-gray-200 rounded" />
+                <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 animate-pulse">
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-4" />
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-4" />
+                  <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
+                  <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded" />
                 </div>
               ))}
             </div>
           ) : trips.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center">
               <p className="text-4xl mb-3">✈️</p>
-              <p className="text-gray-500 text-lg">No trips yet!</p>
-              <p className="text-gray-400 text-sm mt-1">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">No trips yet!</p>
+              <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
                 Start planning your next adventure.
               </p>
               <button

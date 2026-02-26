@@ -33,16 +33,16 @@ export function TripPlannerCard({ trip }: TripPlannerCardProps) {
       : 'Dates TBD';
 
   return (
-    <div className={`trip-card bg-white rounded-2xl shadow-lg p-6 ${!isActive ? 'opacity-80' : ''}`}>
+    <div className={`trip-card bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 ${!isActive ? 'opacity-80' : ''}`}>
       <div className="flex items-start justify-between mb-4">
         <div>
           <span className={`px-3 py-1 rounded-full text-xs font-bold ${config.color}`}>
             {config.label}
           </span>
-          <h3 className="text-2xl font-bold mt-2">{trip.title}</h3>
-          <p className="text-gray-600">{dateRange}</p>
+          <h3 className="text-2xl font-bold mt-2 dark:text-white">{trip.title}</h3>
+          <p className="text-gray-600 dark:text-gray-400">{dateRange}</p>
         </div>
-        <button className="text-gray-400 hover:text-gray-600 p-1">
+        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
           <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
           </svg>
@@ -65,17 +65,17 @@ export function TripPlannerCard({ trip }: TripPlannerCardProps) {
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="bg-purple-50 rounded-xl p-3 text-center">
-          <div className="text-2xl font-bold text-purple-600">{trip.stopCount}</div>
-          <div className="text-xs text-gray-600">Places</div>
+        <div className="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{trip.stopCount}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400">Places</div>
         </div>
-        <div className="bg-pink-50 rounded-xl p-3 text-center">
-          <div className="text-2xl font-bold text-pink-600">{trip.likeCount}</div>
-          <div className="text-xs text-gray-600">Likes</div>
+        <div className="bg-pink-50 dark:bg-pink-900/30 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">{trip.likeCount}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400">Likes</div>
         </div>
-        <div className="bg-blue-50 rounded-xl p-3 text-center">
-          <div className="text-2xl font-bold text-blue-600">{trip.status === 'COMPLETED' ? 'Done' : 'Go'}</div>
-          <div className="text-xs text-gray-600">Status</div>
+        <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{trip.status === 'COMPLETED' ? 'Done' : 'Go'}</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400">Status</div>
         </div>
       </div>
 
@@ -84,7 +84,7 @@ export function TripPlannerCard({ trip }: TripPlannerCardProps) {
         className={`w-full py-3 rounded-xl font-semibold transition-all ${
           isActive
             ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:shadow-lg'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
         }`}
       >
         {isActive ? 'View Trip Details' : 'View Memories'}

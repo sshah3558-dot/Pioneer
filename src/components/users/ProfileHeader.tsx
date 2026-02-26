@@ -29,9 +29,9 @@ export function ProfileHeader({
   const joinYear = new Date(user.createdAt).getFullYear();
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-      {/* Cover Photo — hidden on mobile */}
-      <div className="hidden sm:block sm:h-32 md:h-44 relative">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
+      {/* Cover Photo */}
+      <div className="h-24 sm:h-32 md:h-44 relative">
         {user.coverImageUrl ? (
           <img
             src={user.coverImageUrl}
@@ -46,16 +46,16 @@ export function ProfileHeader({
       {/* Profile info below cover */}
       <div className="px-4 sm:px-6 pb-4">
         {/* Avatar + Action button row */}
-        <div className="flex items-end justify-between mt-3 sm:-mt-12 mb-3">
+        <div className="flex items-end justify-between -mt-8 sm:-mt-12 mb-3">
           <img
             src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=667eea&color=fff&size=128`}
             alt={user.name || 'User'}
-            className="w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-3 sm:border-4 border-white shadow-xl object-cover"
+            className="w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-3 sm:border-4 border-purple-500 shadow-xl object-cover"
           />
           <div className="mb-1">
             {isOwnProfile ? (
               <Link href="/settings/profile">
-                <button className="bg-white text-purple-600 px-4 py-2 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-bold border-2 border-purple-200 hover:shadow-lg transition-all">
+                <button className="bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 px-4 py-2 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-bold border-2 border-purple-200 dark:border-purple-700 hover:shadow-lg transition-all">
                   Edit Profile
                 </button>
               </Link>
@@ -73,39 +73,39 @@ export function ProfileHeader({
 
         {/* Name & Bio */}
         <div className="mb-4">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{user.name}</h1>
-          <p className="text-sm sm:text-base text-gray-500">@{user.username} &middot; Pioneer since {joinYear}</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{user.name}</h1>
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">@{user.username} &middot; Pioneer since {joinYear}</p>
           {user.bio && (
-            <p className="mt-2 text-sm sm:text-base text-gray-700">{user.bio}</p>
+            <p className="mt-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">{user.bio}</p>
           )}
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 sm:gap-4 px-4 sm:px-6 pb-4 border-b">
-        <div className="stat-card rounded-xl p-2 sm:p-4 text-center">
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 sm:gap-4 px-4 sm:px-6 pb-4 border-b dark:border-gray-700">
+        <div className="stat-card dark:bg-gray-800 rounded-xl p-2 sm:p-4 text-center">
           <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{user.reviewCount}</div>
-          <div className="text-xs sm:text-sm text-gray-600 mt-1">Reviews</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Reviews</div>
         </div>
-        <div className="stat-card rounded-xl p-2 sm:p-4 text-center">
+        <div className="stat-card dark:bg-gray-800 rounded-xl p-2 sm:p-4 text-center">
           <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{user.tripCount}</div>
-          <div className="text-xs sm:text-sm text-gray-600 mt-1">Trips</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Moments</div>
         </div>
-        <div className="stat-card rounded-xl p-2 sm:p-4 text-center">
+        <div className="stat-card dark:bg-gray-800 rounded-xl p-2 sm:p-4 text-center">
           <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">
             {user.followerCount >= 1000
               ? `${(user.followerCount / 1000).toFixed(1)}k`
               : user.followerCount}
           </div>
-          <div className="text-xs sm:text-sm text-gray-600 mt-1">Followers</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Followers</div>
         </div>
-        <div className="stat-card rounded-xl p-2 sm:p-4 text-center hidden md:block">
+        <div className="stat-card dark:bg-gray-800 rounded-xl p-2 sm:p-4 text-center hidden md:block">
           <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{user.followingCount}</div>
-          <div className="text-xs sm:text-sm text-gray-600 mt-1">Following</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Following</div>
         </div>
-        <div className="stat-card rounded-xl p-2 sm:p-4 text-center hidden md:block">
+        <div className="stat-card dark:bg-gray-800 rounded-xl p-2 sm:p-4 text-center hidden md:block">
           <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{avgRating}</div>
-          <div className="text-xs sm:text-sm text-gray-600 mt-1">Avg Rating</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Avg Rating</div>
         </div>
       </div>
 

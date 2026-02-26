@@ -79,13 +79,13 @@ export default function ProfileSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-8 animate-pulse">
-        <div className="h-48 bg-gray-200 rounded-xl mb-6" />
-        <div className="h-24 w-24 bg-gray-200 rounded-full mx-auto -mt-18 relative z-10 mb-6" />
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 animate-pulse">
+        <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl mb-6" />
+        <div className="h-24 w-24 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto -mt-18 relative z-10 mb-6" />
         <div className="space-y-4">
-          <div className="h-10 bg-gray-200 rounded-lg" />
-          <div className="h-10 bg-gray-200 rounded-lg" />
-          <div className="h-24 bg-gray-200 rounded-lg" />
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+          <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg" />
         </div>
       </div>
     );
@@ -98,7 +98,7 @@ export default function ProfileSettingsPage() {
   const displayCover = coverPreview || coverImageUrl;
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
       {/* Cover Photo */}
       <div className="relative h-48 bg-gradient-to-r from-purple-600 to-pink-500">
         {displayCover && (
@@ -168,7 +168,7 @@ export default function ProfileSettingsPage() {
 
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Display Name
           </label>
           <input
@@ -177,17 +177,17 @@ export default function ProfileSettingsPage() {
             onChange={(e) => setName(e.target.value)}
             maxLength={100}
             placeholder="Your display name"
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
 
         {/* Username */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Username
           </label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm">
               @
             </span>
             <input
@@ -199,7 +199,7 @@ export default function ProfileSettingsPage() {
               }}
               maxLength={30}
               placeholder="username"
-              className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+              className="w-full pl-8 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 dark:text-gray-100"
             />
           </div>
           <p className="text-xs text-gray-400 mt-1">
@@ -209,7 +209,7 @@ export default function ProfileSettingsPage() {
 
         {/* Bio */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Bio
           </label>
           <textarea
@@ -218,7 +218,7 @@ export default function ProfileSettingsPage() {
             maxLength={500}
             rows={4}
             placeholder="Tell others about yourself..."
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all resize-none"
+            className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all resize-none bg-white dark:bg-gray-800 dark:text-gray-100"
           />
           <p className="text-xs text-gray-400 mt-1 text-right">
             {bio.length}/500

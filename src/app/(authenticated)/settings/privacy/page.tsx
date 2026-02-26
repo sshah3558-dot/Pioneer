@@ -70,11 +70,11 @@ export default function PrivacySettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-8 animate-pulse">
-        <div className="h-6 bg-gray-200 rounded w-1/3 mb-6" />
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 animate-pulse">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6" />
         <div className="space-y-4">
           {[1, 2].map((i) => (
-            <div key={i} className="h-16 bg-gray-200 rounded-xl" />
+            <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded-xl" />
           ))}
         </div>
       </div>
@@ -82,12 +82,12 @@ export default function PrivacySettingsPage() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6">
       <div className="flex items-center gap-2 mb-2">
         <Eye className="w-5 h-5 text-purple-600" />
-        <h2 className="text-lg font-semibold">Privacy Settings</h2>
+        <h2 className="text-lg font-semibold dark:text-gray-100">Privacy Settings</h2>
       </div>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
         Control who can see your content and how you appear to others.
       </p>
 
@@ -95,11 +95,11 @@ export default function PrivacySettingsPage() {
         {privacyOptions.map(({ key, label, description }) => (
           <div
             key={key}
-            className="flex items-center justify-between p-4 border border-gray-100 rounded-xl"
+            className="flex items-center justify-between p-4 border border-gray-100 dark:border-gray-700 rounded-xl"
           >
             <div>
-              <p className="text-sm font-medium text-gray-800">{label}</p>
-              <p className="text-xs text-gray-500">{description}</p>
+              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>
             </div>
             <button
               onClick={() => toggle(key)}

@@ -69,7 +69,7 @@ export default function ExplorePage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold gradient-text-135">Explore Moments</h1>
-        <p className="text-gray-500 text-sm">Discover amazing experiences from travelers worldwide</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">Discover amazing experiences from travelers worldwide</p>
       </div>
 
       {/* Search */}
@@ -77,14 +77,14 @@ export default function ExplorePage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <input
           placeholder="Search moments, places, countries..."
-          className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+          className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all dark:text-gray-100 dark:placeholder-gray-400"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
       </div>
 
       {/* Filter pills + Country dropdown */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
         {filters.map((f) => (
           <button
             key={f.value}
@@ -92,7 +92,7 @@ export default function ExplorePage() {
             className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
               activeFilter === f.value
                 ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-md'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             {f.icon}
@@ -106,7 +106,7 @@ export default function ExplorePage() {
           placeholder="Filter by country..."
           value={country}
           onChange={(e) => setCountry(e.target.value)}
-          className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none w-48"
+          className="px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none w-36 sm:w-48"
         />
       </div>
 
@@ -114,23 +114,23 @@ export default function ExplorePage() {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="rounded-2xl overflow-hidden bg-white shadow-lg animate-pulse">
-              <div className="h-48 bg-gray-200" />
+            <div key={i} className="rounded-2xl overflow-hidden bg-white dark:bg-gray-900 shadow-lg animate-pulse">
+              <div className="h-48 bg-gray-200 dark:bg-gray-700" />
               <div className="p-3 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-gray-200 rounded-full" />
-                  <div className="h-4 bg-gray-200 rounded w-24" />
+                  <div className="w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24" />
                 </div>
-                <div className="h-3 bg-gray-200 rounded w-32" />
-                <div className="h-3 bg-gray-200 rounded w-full" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full" />
               </div>
             </div>
           ))}
         </div>
       ) : moments.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No moments found.</p>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-500 dark:text-gray-400 text-lg">No moments found.</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
             {debouncedSearch || country ? 'Try different search criteria.' : 'Check back soon for new moments!'}
           </p>
         </div>

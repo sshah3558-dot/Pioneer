@@ -30,10 +30,10 @@ export function TripActivity() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6">
       <h3 className="font-bold text-lg mb-4 gradient-text-135">Recent Activity</h3>
       {trips.length === 0 ? (
-        <p className="text-sm text-gray-500">No recent activity yet.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">No recent activity yet.</p>
       ) : (
         <div className="space-y-4">
           {trips.map((trip) => (
@@ -44,12 +44,12 @@ export function TripActivity() {
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <p className="text-sm">
+                <p className="text-sm dark:text-gray-200">
                   <span className="font-bold">{trip.user.name}</span>{' '}
                   {trip.status === 'COMPLETED' ? 'completed' : 'is planning'}{' '}
                   <span className="font-semibold">{trip.title}</span>
                 </p>
-                <p className="text-xs text-gray-500">{timeAgo(trip.updatedAt)}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{timeAgo(trip.updatedAt)}</p>
               </div>
             </div>
           ))}

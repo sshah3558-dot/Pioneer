@@ -18,9 +18,9 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-3xl font-bold mb-6">Settings</h1>
+      <h1 className="text-3xl font-bold mb-6 dark:text-gray-100">Settings</h1>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <nav className="bg-white rounded-2xl shadow-lg p-4 h-fit">
+        <nav className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 h-fit">
           <ul className="space-y-1">
             {settingsNav.map(({ href, label, icon: Icon }) => {
               const isActive = pathname === href;
@@ -32,8 +32,8 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                       'flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium',
                       isActive
                         ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white'
-                        : 'text-gray-600 hover:bg-gray-100',
-                      href === '/settings/danger' && !isActive && 'text-red-500 hover:bg-red-50'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800',
+                      href === '/settings/danger' && !isActive && 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
                     )}
                   >
                     <Icon className="w-5 h-5" />

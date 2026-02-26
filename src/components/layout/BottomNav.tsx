@@ -35,7 +35,7 @@ export function BottomNav() {
               className={cn(
                 'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-xl transition-all min-w-[60px]',
                 isActive
-                  ? 'text-transparent'
+                  ? 'text-purple-600'
                   : 'text-gray-500 hover:text-gray-700'
               )}
             >
@@ -44,14 +44,14 @@ export function BottomNav() {
                   <div className="absolute -inset-1.5 gradient-primary rounded-xl opacity-10" />
                 )}
                 <span className={cn(
-                  isActive && 'gradient-primary-text'
+                  isActive ? 'text-purple-600' : ''
                 )}>
                   {item.icon}
                 </span>
               </div>
               <span className={cn(
                 'text-xs font-medium',
-                isActive ? 'gradient-primary-text' : ''
+                isActive ? 'text-purple-600 font-bold' : ''
               )}>
                 {item.label}
               </span>

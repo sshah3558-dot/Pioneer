@@ -85,23 +85,23 @@ export function QuickAdd() {
   const isDisabled = !name.trim() || !cityId || !address.trim() || isSubmitting;
 
   return (
-    <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl shadow-lg p-6">
+    <div className="bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40 rounded-2xl shadow-lg p-6">
       <h3 className="font-bold text-lg mb-4 gradient-text-135">Quick Add Place</h3>
       <div className="space-y-3">
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Place name" className="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" />
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Place name" className="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 dark:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white dark:bg-gray-800 dark:text-gray-100" />
 
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white">
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 dark:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white dark:bg-gray-800 dark:text-gray-100">
           {CATEGORIES.map(cat => (
             <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
           ))}
         </select>
 
         <div className="relative">
-          <input type="text" value={cityQuery} onChange={(e) => searchCities(e.target.value)} onFocus={() => cityResults.length > 0 && setShowCityDropdown(true)} placeholder="Search city..." className="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" />
+          <input type="text" value={cityQuery} onChange={(e) => searchCities(e.target.value)} onFocus={() => cityResults.length > 0 && setShowCityDropdown(true)} placeholder="Search city..." className="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 dark:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white dark:bg-gray-800 dark:text-gray-100" />
           {showCityDropdown && cityResults.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-40 overflow-y-auto">
+            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl shadow-lg max-h-40 overflow-y-auto">
               {cityResults.map(city => (
-                <button key={city.id} onClick={() => selectCity(city)} className="w-full text-left px-4 py-2 hover:bg-purple-50 text-sm flex items-center gap-2">
+                <button key={city.id} onClick={() => selectCity(city)} className="w-full text-left px-4 py-2 hover:bg-purple-50 dark:hover:bg-purple-900/30 text-sm flex items-center gap-2 dark:text-gray-100">
                   <MapPin className="w-3 h-3 text-purple-500" />
                   {city.name}, {city.country.name}
                 </button>
@@ -110,7 +110,7 @@ export function QuickAdd() {
           )}
         </div>
 
-        <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Address" className="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" />
+        <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Address" className="w-full px-4 py-2.5 rounded-xl border-2 border-purple-300 dark:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white dark:bg-gray-800 dark:text-gray-100" />
 
         {error && <p className="text-red-500 text-xs">{error}</p>}
 

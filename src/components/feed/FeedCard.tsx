@@ -107,7 +107,7 @@ export function FeedCard({ activity, className }: FeedCardProps) {
   const tags = getTags();
 
   return (
-    <div className={cn('post-card rounded-2xl shadow-lg overflow-hidden', className)}>
+    <div className={cn('post-card dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden', className)}>
       <div className="p-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
@@ -119,20 +119,20 @@ export function FeedCard({ activity, className }: FeedCardProps) {
             />
           </Link>
           <div className="flex-1">
-            <Link href={`/users/${activity.user.username}`} className="font-bold text-gray-900 hover:underline">
+            <Link href={`/users/${activity.user.username}`} className="font-bold text-gray-900 dark:text-gray-100 hover:underline">
               {activity.user.name}
             </Link>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               📍 {getLocationText()} • {formatTimeAgo(activity.timestamp)}
             </div>
           </div>
-          <button className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
             <MoreHorizontal className="w-5 h-5" />
           </button>
         </div>
 
         {/* Description */}
-        <p className="text-gray-700 mb-4">{getDescription()}</p>
+        <p className="text-gray-700 dark:text-gray-300 mb-4">{getDescription()}</p>
 
         {/* Image */}
         {image && (
@@ -191,25 +191,25 @@ export function FeedCard({ activity, className }: FeedCardProps) {
         )}
 
         {/* Action bar */}
-        <div className="flex items-center justify-between pt-4 border-t">
+        <div className="flex items-center justify-between pt-4 border-t dark:border-gray-700">
           <button
             onClick={handleLike}
-            className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-500 transition-colors"
           >
             <Heart className={cn('like-btn w-6 h-6', isLiked && 'fill-red-500 text-red-500 like-btn-active')} />
             <span className="font-semibold">{likeCount}</span>
           </button>
-          <button className="flex items-center gap-2 text-gray-600 hover:text-purple-500 transition-colors">
+          <button className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-purple-500 transition-colors">
             <MessageCircle className="w-6 h-6" />
             <span className="font-semibold">Comment</span>
           </button>
-          <button className="flex items-center gap-2 text-gray-600 hover:text-purple-500 transition-colors">
+          <button className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-purple-500 transition-colors">
             <Share2 className="w-6 h-6" />
             <span className="font-semibold">Share</span>
           </button>
           <button
             onClick={() => setIsSaved(!isSaved)}
-            className="text-gray-600 hover:text-purple-500 transition-colors"
+            className="text-gray-600 dark:text-gray-400 hover:text-purple-500 transition-colors"
           >
             <Bookmark className={cn('w-6 h-6', isSaved && 'fill-[#667eea] text-[#667eea]')} />
           </button>

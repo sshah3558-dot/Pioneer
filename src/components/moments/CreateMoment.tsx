@@ -15,7 +15,7 @@ interface CreateMomentProps {
 function StarRating({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-medium text-gray-700 w-28">{label}</span>
+      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-20 sm:w-28">{label}</span>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -123,11 +123,11 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 border-b">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
           <h3 className="text-lg font-bold gradient-text-135">New Moment</h3>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
-            <X className="w-5 h-5 text-gray-500" />
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
@@ -139,7 +139,7 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
             placeholder="Describe your experience..."
             maxLength={500}
             rows={3}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none resize-none"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none resize-none bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
           />
           <p className="text-xs text-gray-400 text-right -mt-2">{content.length}/500</p>
 
@@ -171,8 +171,8 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
           </div>
 
           {/* Ratings */}
-          <div className="space-y-3 bg-gray-50 rounded-xl p-4">
-            <h4 className="font-semibold text-sm text-gray-900">Rate this moment</h4>
+          <div className="space-y-3 bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+            <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">Rate this moment</h4>
             <StarRating label="Overall *" value={overallRating} onChange={setOverallRating} />
             <StarRating label="Value" value={valueRating} onChange={setValueRating} />
             <StarRating label="Authenticity" value={authenticityRating} onChange={setAuthenticityRating} />

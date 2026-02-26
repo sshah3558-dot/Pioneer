@@ -36,20 +36,20 @@ export default function DangerZonePage() {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-8 animate-pulse">
-        <div className="h-6 bg-gray-200 rounded w-1/3 mb-4" />
-        <div className="h-20 bg-gray-200 rounded-xl" />
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 animate-pulse">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4" />
+        <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-xl" />
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-red-200">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 border-2 border-red-200 dark:border-red-800">
       <div className="flex items-center gap-2 mb-2">
         <AlertTriangle className="w-5 h-5 text-red-500" />
-        <h2 className="text-lg font-semibold text-red-600">Danger Zone</h2>
+        <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">Danger Zone</h2>
       </div>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
         Actions here are permanent and cannot be undone. Please proceed with caution.
       </p>
 

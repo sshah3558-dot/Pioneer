@@ -32,7 +32,7 @@ export function RankingCard({ moment }: RankingCardProps) {
   const ratingPill = (label: string, value: number | null) => {
     if (value === null) return null;
     return (
-      <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+      <span className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
         <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
         {label}: {value}/5
       </span>
@@ -40,14 +40,14 @@ export function RankingCard({ moment }: RankingCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden card-hover">
       <div
         className="flex items-center gap-4 p-4 cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
         {/* Rank number */}
         <div className="flex flex-col items-center min-w-[40px]">
-          <span className="text-2xl font-bold text-gray-300">#{moment.rank || '-'}</span>
+          <span className="text-2xl font-bold text-gray-300 dark:text-gray-600">#{moment.rank || '-'}</span>
         </div>
 
         {/* Score badge */}
@@ -66,9 +66,9 @@ export function RankingCard({ moment }: RankingCardProps) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <p className="text-gray-900 font-medium text-sm line-clamp-1">{moment.content}</p>
+          <p className="text-gray-900 dark:text-gray-100 font-medium text-sm line-clamp-1">{moment.content}</p>
           {moment.place && (
-            <p className="text-gray-500 text-xs flex items-center gap-1 mt-1">
+            <p className="text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1 mt-1">
               <MapPin className="w-3 h-3" />
               {moment.place.name}{moment.place.cityName ? `, ${moment.place.cityName}` : ''}
             </p>
@@ -85,7 +85,7 @@ export function RankingCard({ moment }: RankingCardProps) {
 
       {/* Expanded details */}
       {expanded && (
-        <div className="px-4 pb-4 border-t border-gray-100 pt-3">
+        <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-700 pt-3">
           {/* Photos */}
           <div className="flex gap-2 mb-3 overflow-x-auto">
             {[moment.imageUrl, moment.imageUrl2, moment.imageUrl3].filter(Boolean).map((url, i) => (
@@ -94,7 +94,7 @@ export function RankingCard({ moment }: RankingCardProps) {
           </div>
 
           {/* Full content */}
-          <p className="text-gray-700 text-sm mb-3">{moment.content}</p>
+          <p className="text-gray-700 dark:text-gray-300 text-sm mb-3">{moment.content}</p>
 
           {/* Rating pills */}
           <div className="flex flex-wrap gap-2">

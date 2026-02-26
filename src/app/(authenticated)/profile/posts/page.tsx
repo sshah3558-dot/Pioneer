@@ -40,51 +40,51 @@ export default function AllPostsPage() {
     <div className="space-y-6 animate-fade-in">
       {/* Header with back link */}
       <div className="flex items-center gap-3">
-        <Link href="/profile" className="text-gray-500 hover:text-gray-700 transition-colors">
+        <Link href="/profile" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <h2 className="font-bold text-2xl gradient-text-135">All Posts</h2>
         {data?.total && (
-          <span className="text-sm text-gray-500">({data.total} posts)</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">({data.total} posts)</span>
         )}
       </div>
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
-              <div className="h-48 bg-gray-200" />
+            <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden animate-pulse">
+              <div className="h-48 bg-gray-200 dark:bg-gray-700" />
               <div className="p-5 space-y-2">
-                <div className="h-3 bg-gray-200 rounded w-20" />
-                <div className="h-4 bg-gray-200 rounded w-full" />
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
               </div>
             </div>
           ))}
         </div>
       ) : posts.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-          <p className="text-gray-500 text-lg">No posts yet.</p>
-          <p className="text-gray-400 text-sm mt-1">Share your latest discovery on the feed!</p>
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center">
+          <p className="text-gray-500 dark:text-gray-400 text-lg">No posts yet.</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Share your latest discovery on the feed!</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <div key={post.id} className="card-hover bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div key={post.id} className="card-hover bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
                 {post.imageUrl && (
                   <img src={post.imageUrl} alt="" className="w-full h-48 object-cover" />
                 )}
                 <div className="p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs text-gray-500">{timeAgo(post.createdAt)}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{timeAgo(post.createdAt)}</span>
                     {post.likeCount > 0 && (
-                      <span className="bg-pink-100 text-pink-800 px-2 py-1 rounded-full text-xs font-bold">
+                      <span className="bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300 px-2 py-1 rounded-full text-xs font-bold">
                         {post.likeCount} likes
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-700 line-clamp-4">{post.content}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-4">{post.content}</p>
                 </div>
               </div>
             ))}
@@ -95,15 +95,15 @@ export default function AllPostsPage() {
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-4 py-2 rounded-xl bg-white shadow-lg text-sm font-medium disabled:opacity-50 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 rounded-xl bg-white dark:bg-gray-900 shadow-lg text-sm font-medium disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors dark:text-gray-200"
             >
               Previous
             </button>
-            <span className="px-4 py-2 text-sm text-gray-500">Page {page}</span>
+            <span className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Page {page}</span>
             <button
               onClick={() => setPage(p => p + 1)}
               disabled={!data?.hasMore}
-              className="px-4 py-2 rounded-xl bg-white shadow-lg text-sm font-medium disabled:opacity-50 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 rounded-xl bg-white dark:bg-gray-900 shadow-lg text-sm font-medium disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors dark:text-gray-200"
             >
               Next
             </button>

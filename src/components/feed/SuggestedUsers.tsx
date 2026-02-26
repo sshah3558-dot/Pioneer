@@ -64,14 +64,14 @@ export function SuggestedUsers() {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-6 animate-pulse">
-        <div className="h-5 bg-gray-200 rounded w-40 mb-4" />
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6 animate-pulse">
+        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-40 mb-4" />
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-full bg-gray-200" />
+            <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700" />
             <div className="flex-1">
-              <div className="h-4 bg-gray-200 rounded w-24 mb-1" />
-              <div className="h-3 bg-gray-200 rounded w-16" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-1" />
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16" />
             </div>
           </div>
         ))}
@@ -84,7 +84,7 @@ export function SuggestedUsers() {
   if (users.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6">
       <h3 className="font-bold text-lg mb-4 gradient-text-135">Suggested Pioneers</h3>
       <div className="space-y-4">
         {users.map((user) => {
@@ -95,20 +95,20 @@ export function SuggestedUsers() {
               <img
                 src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=667eea&color=fff`}
                 alt={user.name || 'User'}
-                className="w-12 h-12 rounded-full border-2 border-gray-200 object-cover"
+                className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700 object-cover"
               />
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm truncate">{user.name}</div>
-                <div className="text-xs text-gray-500">
+                <div className="font-semibold text-sm truncate dark:text-gray-100">{user.name}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
                   {user.tripCount} trips &middot; {user.reviewCount} reviews
                 </div>
               </div>
               <button
                 onClick={() => toggleFollow(user.id)}
                 disabled={isLoadingFollow}
-                className={`follow-btn px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                className={`follow-btn px-3 sm:px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
                   isFollowing
-                    ? 'bg-gray-200 text-gray-700'
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                     : 'bg-purple-600 text-white'
                 } ${isLoadingFollow ? 'opacity-50' : ''}`}
               >
