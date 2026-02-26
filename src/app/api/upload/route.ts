@@ -1,16 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
+import { prisma } from '@/lib/db/prisma';
 import { supabase, BUCKETS, BucketName, getPublicUrl } from '@/lib/storage/supabase';
 import crypto from 'crypto';
+
+// Image MIME types including iPhone formats
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+  'image/heic', 'image/heif', 'image/svg+xml', 'image/bmp', 'image/tiff',
+];
+
+function isImageFile(file: File): boolean {
+  // Check MIME type
+  if (file.type && (file.type.startsWith('image/') || ALLOWED_IMAGE_TYPES.includes(file.type.toLowerCase()))) {
+    return true;
+  }
+  // Fallback: check file extension for iPhone photos that may lack MIME type
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'svg', 'bmp', 'tiff'].includes(ext);
+}
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json(
         { error: { message: 'Not authenticated', code: 'UNAUTHORIZED' } },
         { status: 401 }
+      );
+    }
+
+    // Look up user ID from email (JWT strategy may not have id)
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: { message: 'User not found', code: 'NOT_FOUND' } },
+        { status: 404 }
       );
     }
 
@@ -38,9 +68,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!file.type.startsWith('image/')) {
+    if (!isImageFile(file)) {
       return NextResponse.json(
-        { error: { message: 'Only image files are allowed', code: 'INVALID_FILE_TYPE' } },
+        { error: { message: `Only image files are allowed. Got: ${file.type || 'unknown type'}, name: ${file.name}`, code: 'INVALID_FILE_TYPE' } },
         { status: 400 }
       );
     }
@@ -54,8 +84,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const ext = file.name.split('.').pop() || 'jpg';
-    const fileName = `${session.user.id}/${crypto.randomUUID()}.${ext}`;
+    // Normalize extension for HEIC -> jpg since Supabase serves them as-is
+    let ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const contentType = file.type || 'image/jpeg';
+
+    const fileName = `${user.id}/${crypto.randomUUID()}.${ext}`;
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -63,7 +96,7 @@ export async function POST(request: NextRequest) {
     const { error: uploadError } = await supabase.storage
       .from(bucketConfig.name)
       .upload(fileName, buffer, {
-        contentType: file.type,
+        contentType,
         upsert: false,
       });
 
@@ -89,10 +122,22 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.email) {
       return NextResponse.json(
         { error: { message: 'Not authenticated', code: 'UNAUTHORIZED' } },
         { status: 401 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: { message: 'User not found', code: 'NOT_FOUND' } },
+        { status: 404 }
       );
     }
 
@@ -121,7 +166,7 @@ export async function DELETE(request: NextRequest) {
 
     const [, bucketName, path] = match;
 
-    if (!path.startsWith(session.user.id + '/')) {
+    if (!path.startsWith(user.id + '/')) {
       return NextResponse.json(
         { error: { message: 'Not authorized to delete this file', code: 'FORBIDDEN' } },
         { status: 403 }

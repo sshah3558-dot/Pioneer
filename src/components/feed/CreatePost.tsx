@@ -16,7 +16,7 @@ export function CreatePost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { upload, isUploading } = useImageUpload('posts');
+  const { upload, isUploading, error: uploadError } = useImageUpload('posts');
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -42,7 +42,7 @@ export function CreatePost() {
       if (selectedFile) {
         const url = await upload(selectedFile);
         if (!url) {
-          setError('Failed to upload image');
+          setError(uploadError || 'Failed to upload image');
           setIsSubmitting(false);
           return;
         }
