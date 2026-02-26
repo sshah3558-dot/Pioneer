@@ -9,6 +9,7 @@ import { CreateTripModal } from '@/components/trips/CreateTripModal';
 import { apiFetch } from '@/lib/api/fetcher';
 import { GetTripsResponse } from '@/types/api';
 import { useSession } from 'next-auth/react';
+import { SavedMoments } from '@/components/moments/SavedMoments';
 
 export default function PlannerPage() {
   const { data: session } = useSession();
@@ -75,6 +76,7 @@ export default function PlannerPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          <SavedMoments />
           <TripActivity />
           <QuickAdd />
         </div>

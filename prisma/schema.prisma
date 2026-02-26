@@ -65,6 +65,7 @@ model User {
   // Likes
   reviewLikes        ReviewLike[]
   tripLikes          TripLike[]
+  momentSaves        MomentSave[]
 
   @@map("users")
 }
@@ -271,6 +272,7 @@ model Place {
   photos          Photo[]
   tripStops       TripStop[]
   saves           UserSave[]
+  moments         Post[]
 
   @@index([cityId])
   @@index([category])
@@ -463,7 +465,7 @@ model TripLike {
 }
 
 // ============================================
-// POSTS (Feed Posts)
+// POSTS (Feed Posts / Moments)
 // ============================================
 
 model Post {
@@ -471,15 +473,49 @@ model Post {
   userId    String
   content   String   @db.Text
   imageUrl  String?
+  imageUrl2 String?
+  imageUrl3 String?
   likeCount Int      @default(0)
+  viewCount Int      @default(0)
+
+  // Moment ratings (1-5)
+  overallRating      Int?
+  valueRating        Int?
+  authenticityRating Int?
+  crowdRating        Int?
+
+  // Computed
+  compositeScore Float?
+  rank           Int?
+
+  // Place reference
+  placeId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place? @relation(fields: [placeId], references: [id])
+  saves MomentSave[]
 
   @@index([userId])
   @@index([createdAt])
+  @@index([compositeScore])
+  @@index([viewCount])
   @@map("posts")
+}
+
+model MomentSave {
+  id       String   @id @default(cuid())
+  userId   String
+  postId   String
+  savedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("moment_saves")
 }
 
 // ============================================

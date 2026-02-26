@@ -6,6 +6,7 @@ import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import { apiFetch } from '@/lib/api/fetcher';
 import { X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 
 export function CreatePost() {
   const { user } = useCurrentUser();
@@ -108,14 +109,19 @@ export function CreatePost() {
             Add Photo
           </button>
         </div>
-        <button
-          onClick={handleSubmit}
-          disabled={isDisabled}
-          className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-2 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          {(isSubmitting || isUploading) && <Loader2 className="w-4 h-4 animate-spin" />}
-          Post
-        </button>
+        <div className="flex items-center gap-4">
+          <Link href="/forums" className="text-xs text-purple-500 hover:text-purple-700">
+            Create a rated Moment →
+          </Link>
+          <button
+            onClick={handleSubmit}
+            disabled={isDisabled}
+            className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-2 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {(isSubmitting || isUploading) && <Loader2 className="w-4 h-4 animate-spin" />}
+            Post
+          </button>
+        </div>
       </div>
     </div>
   );

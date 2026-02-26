@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from './ThemeToggle';
 
 interface NavItem {
   href: string;
@@ -17,7 +18,7 @@ const navItems: NavItem[] = [
   { href: '/feed', label: 'Feed', emoji: '\u{1F3E0}' },
   { href: '/explore', label: 'Explore', emoji: '\u{1F50D}' },
   { href: '/planner', label: 'Trips', emoji: '\u{2708}\u{FE0F}' },
-  { href: '/forums', label: 'Forums', emoji: '\u{1F4AC}' },
+  { href: '/forums', label: 'Rankings', emoji: '\u{1F3C6}' },
   { href: '/profile', label: 'Profile', emoji: '\u{1F464}' },
 ];
 
@@ -31,7 +32,7 @@ export function TopNav() {
     `https://ui-avatars.com/api/?name=${encodeURIComponent(session?.user?.name || 'U')}&background=667eea&color=fff`;
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-purple-500 hidden md:block">
+    <nav className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50 border-b-4 border-purple-500 hidden md:block">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -55,7 +56,7 @@ export function TopNav() {
                     'px-6 py-2.5 rounded-full font-semibold transition-all duration-300 hover:-translate-y-0.5',
                     isActive
                       ? 'nav-item-active bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white shadow-[0_4px_15px_rgba(102,126,234,0.4)]'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   )}
                 >
                   {item.emoji} {item.label}
@@ -71,6 +72,7 @@ export function TopNav() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
             </button>
+            <ThemeToggle />
             <div className="relative">
               <button
                 onClick={() => setShowMenu(!showMenu)}
@@ -83,7 +85,7 @@ export function TopNav() {
                 />
               </button>
               {showMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="font-semibold text-sm text-gray-900 truncate">
                       {session?.user?.name}

@@ -1,28 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { Input } from '@/components/ui/input';
-import { PlaceCard } from '@/components/places/PlaceCard';
+import { Search, Sparkles, Eye, TrendingUp } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { MomentCard } from '@/components/moments/MomentCard';
 import { apiFetch } from '@/lib/api/fetcher';
-import { GetPlacesResponse } from '@/types/api';
 
-const categoryFilters = [
-  { label: 'All', value: '' },
-  { label: 'Restaurants', value: 'RESTAURANT' },
-  { label: 'Cafes', value: 'CAFE' },
-  { label: 'Markets', value: 'MARKET' },
-  { label: 'Monuments', value: 'MONUMENT' },
-  { label: 'Parks', value: 'PARK' },
-  { label: 'Viewpoints', value: 'VIEWPOINT' },
-  { label: 'Hidden Gems', value: 'HIDDEN_GEM' },
+type FilterType = 'recommended' | 'mostViewed' | 'topRated';
+
+const filters: { label: string; value: FilterType; icon: React.ReactNode }[] = [
+  { label: 'Recommended', value: 'recommended', icon: <Sparkles className="w-4 h-4" /> },
+  { label: 'Most Viewed', value: 'mostViewed', icon: <Eye className="w-4 h-4" /> },
+  { label: 'Top Rated', value: 'topRated', icon: <TrendingUp className="w-4 h-4" /> },
 ];
 
 export default function ExplorePage() {
+  const queryClient = useQueryClient();
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('recommended');
+  const [country, setCountry] = useState('');
 
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedSearch(searchInput), 300);
@@ -30,26 +27,37 @@ export default function ExplorePage() {
   }, [searchInput]);
 
   const queryParams = new URLSearchParams();
+  queryParams.set('filter', activeFilter);
   if (debouncedSearch) queryParams.set('search', debouncedSearch);
-  if (activeCategory) queryParams.set('categories', activeCategory);
+  if (country) queryParams.set('country', country);
   queryParams.set('pageSize', '20');
 
   const { data, isLoading } = useQuery({
-    queryKey: ['places', debouncedSearch, activeCategory],
-    queryFn: () => apiFetch<GetPlacesResponse>(`/api/places?${queryParams.toString()}`),
+    queryKey: ['moments', activeFilter, debouncedSearch, country],
+    queryFn: () => apiFetch<{
+      items: Array<{
+        id: string;
+        content: string;
+        imageUrl: string | null;
+        compositeScore: number | null;
+        viewCount: number;
+        user: { id: string; name: string | null; username: string | null; avatarUrl: string | null };
+        place: { name: string; cityName?: string; countryName?: string } | null;
+        isSaved: boolean;
+      }>;
+      total: number;
+      hasMore: boolean;
+    }>(`/api/moments?${queryParams.toString()}`),
   });
 
-  const places = data?.items || [];
+  const moments = data?.items || [];
 
-  const handleSave = async (placeId: string) => {
-    const place = places.find((p) => p.id === placeId);
-    if (!place) return;
-
+  const handleToggleSave = async (momentId: string, currentlySaved: boolean) => {
     try {
-      if (place.isSaved) {
-        await fetch(`/api/places/${placeId}/save`, { method: 'DELETE' });
+      if (currentlySaved) {
+        await fetch(`/api/moments/${momentId}/save`, { method: 'DELETE' });
       } else {
-        await fetch(`/api/places/${placeId}/save`, { method: 'POST' });
+        await fetch(`/api/moments/${momentId}/save`, { method: 'POST' });
       }
     } catch (err) {
       console.error('Save toggle failed:', err);
@@ -60,62 +68,80 @@ export default function ExplorePage() {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Explore</h1>
-        <p className="text-gray-500 text-sm">Discover amazing places around the world</p>
+        <h1 className="text-3xl font-bold gradient-text-135">Explore Moments</h1>
+        <p className="text-gray-500 text-sm">Discover amazing experiences from travelers worldwide</p>
       </div>
 
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <Input
-          placeholder="Search places, restaurants, cafes..."
-          className="pl-10"
+        <input
+          placeholder="Search moments, places, countries..."
+          className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
       </div>
 
-      {/* Category Filters */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {categoryFilters.map((cat) => (
+      {/* Filter pills + Country dropdown */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {filters.map((f) => (
           <button
-            key={cat.value}
-            onClick={() => setActiveCategory(cat.value)}
-            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
-              activeCategory === cat.value
+            key={f.value}
+            onClick={() => setActiveFilter(f.value)}
+            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+              activeFilter === f.value
                 ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            {cat.label}
+            {f.icon}
+            {f.label}
           </button>
         ))}
+
+        {/* Country filter */}
+        <input
+          type="text"
+          placeholder="Filter by country..."
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none w-48"
+        />
       </div>
 
-      {/* Places Grid */}
+      {/* Moments Grid */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map((i) => (
+          {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="rounded-2xl overflow-hidden bg-white shadow-lg animate-pulse">
-              <div className="h-40 bg-gray-200" />
-              <div className="p-4 space-y-2">
-                <div className="h-5 bg-gray-200 rounded w-32" />
-                <div className="h-4 bg-gray-200 rounded w-24" />
+              <div className="h-48 bg-gray-200" />
+              <div className="p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-gray-200 rounded-full" />
+                  <div className="h-4 bg-gray-200 rounded w-24" />
+                </div>
+                <div className="h-3 bg-gray-200 rounded w-32" />
+                <div className="h-3 bg-gray-200 rounded w-full" />
               </div>
             </div>
           ))}
         </div>
-      ) : places.length === 0 ? (
+      ) : moments.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No places found.</p>
+          <p className="text-gray-500 text-lg">No moments found.</p>
           <p className="text-gray-400 text-sm mt-1">
-            {debouncedSearch ? 'Try a different search term.' : 'Check back soon for new places!'}
+            {debouncedSearch || country ? 'Try different search criteria.' : 'Check back soon for new moments!'}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {places.map((place) => (
-            <PlaceCard key={place.id} place={place} onSave={handleSave} />
+          {moments.map((moment) => (
+            <MomentCard
+              key={moment.id}
+              moment={moment}
+              onToggleSave={handleToggleSave}
+            />
           ))}
         </div>
       )}

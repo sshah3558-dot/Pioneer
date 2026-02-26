@@ -5,6 +5,7 @@ import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-r
 import { FeedActivity } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { ScoreBadge } from '@/components/moments/ScoreBadge';
 
 interface FeedCardProps {
   activity: FeedActivity;
@@ -135,13 +136,20 @@ export function FeedCard({ activity, className }: FeedCardProps) {
 
         {/* Image */}
         {image && (
-          <Link href={getLink()}>
-            <img
-              src={image}
-              alt=""
-              className="w-full h-80 object-cover rounded-xl mb-4"
-            />
-          </Link>
+          <div className="relative mb-4">
+            <Link href={getLink()}>
+              <img
+                src={image}
+                alt=""
+                className="w-full h-80 object-cover rounded-xl"
+              />
+            </Link>
+            {activity.post?.compositeScore && (
+              <div className="absolute top-3 right-3">
+                <ScoreBadge score={activity.post.compositeScore} size="md" />
+              </div>
+            )}
+          </div>
         )}
 
         {/* Tag pills */}
@@ -155,6 +163,30 @@ export function FeedCard({ activity, className }: FeedCardProps) {
                 {tag.label}
               </span>
             ))}
+          </div>
+        )}
+
+        {/* Moment ratings */}
+        {activity.post?.overallRating && (
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-semibold">
+              Overall: {activity.post.overallRating}/5
+            </span>
+            {activity.post.valueRating && (
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">
+                Value: {activity.post.valueRating}/5
+              </span>
+            )}
+            {activity.post.authenticityRating && (
+              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
+                Authenticity: {activity.post.authenticityRating}/5
+              </span>
+            )}
+            {activity.post.crowdRating && (
+              <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-xs font-semibold">
+                Crowd: {activity.post.crowdRating}/5
+              </span>
+            )}
           </div>
         )}
 

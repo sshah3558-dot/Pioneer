@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Search, Plane, MessageSquare, User } from 'lucide-react';
+import { Home, Search, Plane, Trophy, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -15,7 +15,7 @@ const navItems: NavItem[] = [
   { href: '/feed', label: 'Feed', icon: <Home className="w-5 h-5" /> },
   { href: '/explore', label: 'Explore', icon: <Search className="w-5 h-5" /> },
   { href: '/planner', label: 'Trips', icon: <Plane className="w-5 h-5" /> },
-  { href: '/forums', label: 'Forums', icon: <MessageSquare className="w-5 h-5" /> },
+  { href: '/forums', label: 'Rankings', icon: <Trophy className="w-5 h-5" /> },
   { href: '/profile', label: 'Profile', icon: <User className="w-5 h-5" /> },
 ];
 
@@ -23,7 +23,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 md:hidden">
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -63,7 +63,7 @@ export function BottomNav() {
         })}
       </div>
       {/* Safe area padding for notched devices */}
-      <div className="h-safe-area-inset-bottom bg-white" />
+      <div className="h-safe-area-inset-bottom bg-white dark:bg-gray-900" />
     </nav>
   );
 }

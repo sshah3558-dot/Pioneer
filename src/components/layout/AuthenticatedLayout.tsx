@@ -9,7 +9,7 @@ interface AuthenticatedLayoutProps {
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-gray-950">
       {/* Desktop top nav */}
       <TopNav />
 
