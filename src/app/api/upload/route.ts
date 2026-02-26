@@ -3,12 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { supabase, BUCKETS, BucketName, getPublicUrl } from '@/lib/storage/supabase';
+import { rateLimit } from '@/lib/security/rate-limiter';
 import crypto from 'crypto';
 
 // Image MIME types including iPhone formats
 const ALLOWED_IMAGE_TYPES = [
   'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-  'image/heic', 'image/heif', 'image/svg+xml', 'image/bmp', 'image/tiff',
+  'image/heic', 'image/heif', 'image/bmp', 'image/tiff',
 ];
 
 function isImageFile(file: File): boolean {
@@ -18,11 +19,21 @@ function isImageFile(file: File): boolean {
   }
   // Fallback: check file extension for iPhone photos that may lack MIME type
   const ext = file.name.split('.').pop()?.toLowerCase() || '';
-  return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'svg', 'bmp', 'tiff'].includes(ext);
+  return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'bmp', 'tiff'].includes(ext);
 }
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 20 requests per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    const { allowed, remaining } = rateLimit(ip, 20, 60_000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: { message: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' } },
+        { status: 429, headers: { 'X-RateLimit-Remaining': String(remaining) } }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json(

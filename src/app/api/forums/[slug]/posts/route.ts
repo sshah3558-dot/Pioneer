@@ -74,7 +74,7 @@ export async function GET(
 
 const createPostSchema = z.object({
   title: z.string().min(1).max(200),
-  content: z.string().min(1),
+  content: z.string().min(1).max(10000),
 });
 
 // POST /api/forums/[slug]/posts - Create a post

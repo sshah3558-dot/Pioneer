@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
-import { GetUserResponse } from '@/types/api';
-import { InterestCategory, SocialPlatform, User } from '@/types/user';
+import { InterestCategory, SocialPlatform, User, UserProfile } from '@/types/user';
 
 type Params = Promise<{ username: string }>;
 
@@ -60,10 +59,10 @@ export async function GET(
       }
     }
 
-    const response: GetUserResponse = {
+    // Omit email from public profile responses (email is only available via /api/users/me)
+    const response: { user: Omit<UserProfile, 'email'> } = {
       user: {
         id: user.id,
-        email: user.email,
         name: user.name,
         username: user.username,
         bio: user.bio,

@@ -111,9 +111,9 @@ export default function ProfileSettingsPage() {
         <button
           onClick={() => coverInputRef.current?.click()}
           className="absolute bottom-3 right-3 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
-          disabled={coverUpload.isUploading}
+          disabled={coverUpload.isUploading || coverUpload.isCompressing}
         >
-          {coverUpload.isUploading ? (
+          {coverUpload.isUploading || coverUpload.isCompressing ? (
             <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
             <Camera className="w-5 h-5" />
@@ -139,9 +139,9 @@ export default function ProfileSettingsPage() {
           <button
             onClick={() => avatarInputRef.current?.click()}
             className="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 text-white p-1.5 rounded-full transition-colors"
-            disabled={avatarUpload.isUploading}
+            disabled={avatarUpload.isUploading || avatarUpload.isCompressing}
           >
-            {avatarUpload.isUploading ? (
+            {avatarUpload.isUploading || avatarUpload.isCompressing ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Camera className="w-4 h-4" />

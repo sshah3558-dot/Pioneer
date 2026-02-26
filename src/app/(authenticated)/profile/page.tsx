@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ProfileHeader } from '@/components/users/ProfileHeader';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { apiFetch } from '@/lib/api/fetcher';
+import Link from 'next/link';
 
 export default function ProfilePage() {
   const { user, isLoading: userLoading } = useCurrentUser();
@@ -29,7 +30,7 @@ export default function ProfilePage() {
       imageUrl: string | null;
       likeCount: number;
       createdAt: string;
-    }> }>('/api/posts?userId=me'),
+    }>, hasMore: boolean }>('/api/posts?userId=me&pageSize=3'),
     enabled: !!user,
   });
 
@@ -96,7 +97,14 @@ export default function ProfilePage() {
       )}
 
       {/* My Posts */}
-      <h3 className="font-bold text-2xl gradient-text-135">My Posts</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-2xl gradient-text-135">My Posts</h3>
+        {posts.length > 0 && (
+          <Link href="/profile/posts" className="text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors">
+            View All Posts &rarr;
+          </Link>
+        )}
+      </div>
       {posts.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           <p className="text-gray-500 text-lg">No posts yet.</p>

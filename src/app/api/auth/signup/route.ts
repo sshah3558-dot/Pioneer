@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
 import { hashPassword, validatePasswordStrength } from '@/lib/auth/password';
+import { rateLimit } from '@/lib/security/rate-limiter';
 import { SignupResponse } from '@/types/api';
 import { User } from '@/types/user';
 
@@ -14,6 +15,16 @@ const signupSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 5 requests per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    const { allowed, remaining } = rateLimit(ip, 5, 60_000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: { message: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' } },
+        { status: 429, headers: { 'X-RateLimit-Remaining': String(remaining) } }
+      );
+    }
+
     const body = await request.json();
     const data = signupSchema.parse(body);
 

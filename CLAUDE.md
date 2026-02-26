@@ -59,7 +59,25 @@ Rebuilt the entire UI to match HTML mockups in `docs/pioneer-mvp-complete.html` 
 - `src/lib/mock-data.ts` — Extended with trip planner, forum, suggested user data
 
 ### Build Status
-`npm run build` passes clean — 0 errors, all 33 routes generated.
+`npm run build` passes clean — 0 errors, all 34 routes generated.
+
+### Security Hardening (Feb 2026)
+- **Rate limiting** added to login (10/min), signup (5/min), upload (20/min) via `src/lib/security/rate-limiter.ts`
+- **Security headers** in `next.config.ts`: X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- **SVG uploads blocked** — removed from allowed image types (XSS vector)
+- **Email stripped** from public user profile API (`/api/users/[username]`) — only available via `/api/users/me`
+- **Forum post max length** added (10,000 chars) to prevent abuse
+- **Client-side image compression** via `src/lib/utils/compress-image.ts` — auto-compresses before upload to fit bucket limits
+
+### Profile "My Posts" Enhancement (Feb 2026)
+- Profile page now shows max 3 posts with "View All Posts" link
+- New `/profile/posts` page with full pagination (12 per page)
+
+## Known Issues & Gotchas
+- **Image uploads fail if file > bucket max size AND client compression is bypassed** — always use the `useImageUpload` hook which handles compression automatically
+- **SVG files are intentionally blocked** for upload — they can contain embedded JavaScript (XSS)
+- **Public user profiles do NOT include email** — use `/api/users/me` for the current user's email
+- **Rate limiter is in-memory** — resets on server restart, not shared across instances. For production with multiple instances, switch to Redis-based rate limiting
 
 ## What's Next
 - Visual QA pass against the HTML mockups at mobile (375px) and desktop (1280px+)
@@ -67,4 +85,3 @@ Rebuilt the entire UI to match HTML mockups in `docs/pioneer-mvp-complete.html` 
 - Connect mock data to real Prisma DB / API routes
 - Implement Explore page
 - Wire up auth flow
-- NOTE: Changes are NOT yet committed to git
