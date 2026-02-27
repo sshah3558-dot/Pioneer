@@ -59,6 +59,8 @@ export default function ExplorePage() {
       } else {
         await fetch(`/api/moments/${momentId}/save`, { method: 'POST' });
       }
+      queryClient.invalidateQueries({ queryKey: ['moments'] });
+      queryClient.invalidateQueries({ queryKey: ['savedMoments'] });
     } catch (err) {
       console.error('Save toggle failed:', err);
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import { apiFetch } from '@/lib/api/fetcher';
@@ -36,9 +36,23 @@ export default function ProfileSettingsPage() {
     setInitialized(true);
   }
 
+  // Clean up object URLs on unmount or when previews change
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
+
+  useEffect(() => {
+    return () => {
+      if (coverPreview) URL.revokeObjectURL(coverPreview);
+    };
+  }, [coverPreview]);
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     setAvatarPreview(URL.createObjectURL(file));
     const url = await avatarUpload.upload(file);
     if (url) setAvatarUrl(url);
@@ -47,6 +61,7 @@ export default function ProfileSettingsPage() {
   const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
     setCoverPreview(URL.createObjectURL(file));
     const url = await coverUpload.upload(file);
     if (url) setCoverImageUrl(url);

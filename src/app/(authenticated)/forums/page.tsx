@@ -99,6 +99,52 @@ export default function RankingsPage() {
         </div>
       )}
 
+      {/* Unranked Moments */}
+      {!isLoading && unrankedPosts.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-1">Unranked Moments</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Add ratings to these moments to include them in your rankings.
+          </p>
+          <div className="space-y-3">
+            {unrankedPosts.map((moment) => (
+              <div key={moment.id} className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden card-hover">
+                <div className="flex items-center gap-4 p-4">
+                  {/* No rank number for unranked */}
+                  <div className="flex flex-col items-center min-w-[40px]">
+                    <span className="text-2xl font-bold text-gray-200 dark:text-gray-700">--</span>
+                  </div>
+
+                  {/* Photo thumbnail */}
+                  {moment.imageUrl && (
+                    <img
+                      src={moment.imageUrl}
+                      alt=""
+                      className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
+                    />
+                  )}
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 dark:text-gray-100 font-medium text-sm line-clamp-1">{moment.content}</p>
+                    {moment.place && (
+                      <p className="text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1 mt-1">
+                        {moment.place.name}{moment.place.cityName ? `, ${moment.place.cityName}` : ''}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Unrated badge */}
+                  <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-full flex-shrink-0">
+                    No rating
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <CreateMoment isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
     </div>
   );

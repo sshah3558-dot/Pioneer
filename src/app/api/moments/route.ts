@@ -4,6 +4,19 @@ import { z } from 'zod';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { getRecommendedMomentIds } from '@/lib/ai/recommendations';
+import { Prisma } from '@prisma/client';
+
+type MomentWithRelations = Prisma.PostGetPayload<{
+  include: {
+    user: { select: { id: true; name: true; username: true; avatarUrl: true } };
+    place: {
+      select: {
+        id: true; name: true; category: true; imageUrl: true;
+        city: { select: { name: true; country: { select: { name: true } } } };
+      };
+    };
+  };
+}>;
 
 const querySchema = z.object({
   filter: z.enum(['recommended', 'mostViewed', 'topRated']).default('recommended'),
@@ -70,23 +83,31 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Build where clause
-    const where: Record<string, unknown> = {
-      compositeScore: { not: null },
-    };
+    // Build where clause using AND to combine all filters
+    const andConditions: Record<string, unknown>[] = [
+      { compositeScore: { not: null } },
+    ];
 
     if (query.search) {
-      where.OR = [
-        { content: { contains: query.search, mode: 'insensitive' } },
-        { place: { name: { contains: query.search, mode: 'insensitive' } } },
-      ];
+      andConditions.push({
+        OR: [
+          { content: { contains: query.search, mode: 'insensitive' } },
+          { place: { name: { contains: query.search, mode: 'insensitive' } } },
+        ],
+      });
     }
 
     if (query.country) {
-      where.place = {
-        city: { country: { name: { equals: query.country, mode: 'insensitive' } } },
-      };
+      andConditions.push({
+        place: {
+          city: { country: { name: { equals: query.country, mode: 'insensitive' } } },
+        },
+      });
     }
+
+    const where: Record<string, unknown> = {
+      AND: andConditions,
+    };
 
     let orderBy: Record<string, string> = { createdAt: 'desc' };
     let specificIds: string[] | null = null;
@@ -112,8 +133,15 @@ export async function GET(request: NextRequest) {
     let total;
 
     if (specificIds) {
+      // Merge recommended IDs with search/country filters
+      const recommendedWhere: Record<string, unknown> = {
+        AND: [
+          { id: { in: specificIds } },
+          ...andConditions,
+        ],
+      };
       moments = await prisma.post.findMany({
-        where: { id: { in: specificIds } },
+        where: recommendedWhere,
         include: {
           user: { select: { id: true, name: true, username: true, avatarUrl: true } },
           place: {
@@ -126,7 +154,7 @@ export async function GET(request: NextRequest) {
       });
       // Preserve recommendation order
       const orderMap = new Map(specificIds.map((id, i) => [id, i]));
-      moments.sort((a, b) => (orderMap.get(a.id) || 0) - (orderMap.get(b.id) || 0));
+      moments.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
       total = moments.length;
     } else {
       [moments, total] = await Promise.all([
@@ -182,7 +210,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function formatMoment(post: any) {
+function formatMoment(post: MomentWithRelations) {
   return {
     id: post.id,
     content: post.content,

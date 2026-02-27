@@ -24,7 +24,7 @@ interface MomentCardProps {
     } | null;
     isSaved: boolean;
   };
-  onToggleSave: (id: string, currentlySaved: boolean) => void;
+  onToggleSave: (id: string, currentlySaved: boolean) => void | Promise<void>;
 }
 
 export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
@@ -32,9 +32,17 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
 
   const handleSave = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    const previousState = saved;
     const newState = !saved;
+    // Optimistically toggle
     setSaved(newState);
-    onToggleSave(moment.id, !newState);
+    try {
+      // Pass the previous state so the parent knows which HTTP method to use
+      await onToggleSave(moment.id, previousState);
+    } catch {
+      // Roll back on failure
+      setSaved(previousState);
+    }
   };
 
   return (
@@ -48,13 +56,13 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
             className="w-full h-48 object-cover"
           />
         ) : (
-          <div className="w-full h-48 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-            <MapPin className="w-8 h-8 text-purple-300" />
+          <div className="w-full h-48 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40 flex items-center justify-center">
+            <MapPin className="w-8 h-8 text-purple-300 dark:text-purple-500" />
           </div>
         )}
 
         {/* Score badge top-right */}
-        {moment.compositeScore && (
+        {moment.compositeScore != null && (
           <div className="absolute top-3 right-3">
             <ScoreBadge score={moment.compositeScore} size="sm" />
           </div>

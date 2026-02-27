@@ -5,6 +5,43 @@ interface ScoredMoment {
   score: number;
 }
 
+/**
+ * Maps PlaceCategory enum values to InterestCategory enum values.
+ * Returns null if there is no meaningful mapping.
+ */
+function mapPlaceCategoryToInterest(placeCategory: string): string | null {
+  const mapping: Record<string, string> = {
+    // FOOD_DRINK
+    RESTAURANT: 'FOOD_DRINK',
+    CAFE: 'FOOD_DRINK',
+    BAR: 'FOOD_DRINK',
+    // ART_CULTURE
+    MUSEUM: 'ART_CULTURE',
+    GALLERY: 'ART_CULTURE',
+    // OUTDOORS_NATURE
+    PARK: 'OUTDOORS_NATURE',
+    BEACH: 'OUTDOORS_NATURE',
+    VIEWPOINT: 'OUTDOORS_NATURE',
+    // NIGHTLIFE
+    NIGHTCLUB: 'NIGHTLIFE',
+    // SHOPPING
+    MARKET: 'SHOPPING',
+    SHOP: 'SHOPPING',
+    // HISTORY
+    MONUMENT: 'HISTORY',
+    LANDMARK: 'HISTORY',
+    // ADVENTURE
+    TOUR: 'ADVENTURE',
+    ACTIVITY: 'ADVENTURE',
+    // RELAXATION
+    HOTEL: 'RELAXATION',
+    HOSTEL: 'RELAXATION',
+    // LOCAL_EXPERIENCES
+    HIDDEN_GEM: 'LOCAL_EXPERIENCES',
+  };
+  return mapping[placeCategory] ?? null;
+}
+
 export async function getRecommendedMomentIds(
   userId: string,
   limit: number = 20,
@@ -51,8 +88,11 @@ export async function getRecommendedMomentIds(
   const scored: ScoredMoment[] = moments.map(m => {
     let score = 0;
 
-    if (m.place?.category && interestMap.has(m.place.category as string)) {
-      score += 3 * (interestMap.get(m.place.category as string) || 1);
+    const mappedInterest = m.place?.category
+      ? mapPlaceCategoryToInterest(m.place.category as string)
+      : null;
+    if (mappedInterest && interestMap.has(mappedInterest)) {
+      score += 3 * (interestMap.get(mappedInterest) || 1);
     }
 
     if (followingIds.has(m.userId)) {

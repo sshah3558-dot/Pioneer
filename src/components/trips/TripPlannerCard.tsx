@@ -8,9 +8,9 @@ interface TripPlannerCardProps {
 
 export function TripPlannerCard({ trip }: TripPlannerCardProps) {
   const statusConfig = {
-    PLANNING: { label: 'Planning', color: 'bg-blue-100 text-blue-700' },
-    IN_PROGRESS: { label: 'Active', color: 'bg-green-100 text-green-700' },
-    COMPLETED: { label: 'Completed', color: 'bg-gray-100 text-gray-700' },
+    PLANNING: { label: 'Planning', color: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' },
+    IN_PROGRESS: { label: 'Active', color: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' },
+    COMPLETED: { label: 'Completed', color: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300' },
   };
 
   const config = statusConfig[trip.status];
@@ -52,11 +52,11 @@ export function TripPlannerCard({ trip }: TripPlannerCardProps) {
       {/* Destination */}
       <div className="mb-4">
         <div className="flex flex-wrap gap-2">
-          <span className="destination-tag bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">
+          <span className="destination-tag bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-semibold">
             {trip.city.name}, {trip.city.country.name}
           </span>
           {trip.stopCount > 0 && (
-            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
+            <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-semibold">
               {trip.stopCount} stop{trip.stopCount !== 1 ? 's' : ''}
             </span>
           )}

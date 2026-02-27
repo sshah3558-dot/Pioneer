@@ -271,6 +271,11 @@
   transition: all 0.3s ease;
 }
 
+:is(.dark *).post-card,
+.dark .post-card {
+  background: transparent;
+}
+
 .post-card:hover {
   box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
@@ -293,6 +298,11 @@
 .member-avatar {
   border: 3px solid white;
   transition: all 0.3s ease;
+}
+
+:is(.dark *).member-avatar,
+.dark .member-avatar {
+  border-color: #1f2937;
 }
 
 .member-avatar:hover {
@@ -346,6 +356,11 @@
 .upload-zone {
   transition: all 0.3s ease;
   border: 3px dashed #d1d5db;
+}
+
+:is(.dark *).upload-zone,
+.dark .upload-zone {
+  border-color: #4b5563;
 }
 
 .upload-zone:hover {

@@ -264,7 +264,29 @@ export interface FeedItem {
   trip?: TripCard;
   review?: ReviewCard;
   follow?: { follower: UserPreview; following: UserPreview };
-  post?: { id: string; content: string; imageUrl: string | null; likeCount: number; user: UserPreview; createdAt: string };
+  post?: {
+    id: string;
+    content: string;
+    imageUrl: string | null;
+    imageUrl2: string | null;
+    imageUrl3: string | null;
+    overallRating: number | null;
+    valueRating: number | null;
+    authenticityRating: number | null;
+    crowdRating: number | null;
+    compositeScore: number | null;
+    likeCount: number;
+    user: UserPreview;
+    createdAt: string;
+    place?: {
+      id: string;
+      name: string;
+      category: string;
+      imageUrl: string | null;
+      cityName?: string;
+      countryName?: string;
+    } | null;
+  };
 }
 
 export interface GetFeedResponse extends PaginatedResponse<FeedItem> {}
@@ -413,10 +435,32 @@ export interface SearchResponse {
 export interface CreatePostRequest {
   content: string;
   imageUrl?: string;
+  imageUrl2?: string;
+  imageUrl3?: string;
+  overallRating?: number;
+  valueRating?: number;
+  authenticityRating?: number;
+  crowdRating?: number;
+  placeId?: string;
 }
 
 export interface CreatePostResponse {
-  post: { id: string; content: string; imageUrl: string | null; likeCount: number; createdAt: string };
+  post: {
+    id: string;
+    content: string;
+    imageUrl: string | null;
+    imageUrl2: string | null;
+    imageUrl3: string | null;
+    likeCount: number;
+    viewCount: number;
+    overallRating: number | null;
+    valueRating: number | null;
+    authenticityRating: number | null;
+    crowdRating: number | null;
+    compositeScore: number | null;
+    rank: number | null;
+    createdAt: string;
+  };
 }
 
 // POST /api/upload

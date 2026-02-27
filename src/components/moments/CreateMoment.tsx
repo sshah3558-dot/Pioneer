@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
@@ -53,6 +53,7 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
   const [crowdRating, setCrowdRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -81,9 +82,18 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
 
     try {
       const uploadedUrls: (string | undefined)[] = [];
+      const failedUploads: string[] = [];
       for (const photo of photos) {
-        const url = await upload(photo.file);
-        uploadedUrls.push(url || undefined);
+        try {
+          const url = await upload(photo.file);
+          uploadedUrls.push(url || undefined);
+        } catch (uploadErr) {
+          failedUploads.push(photo.file.name);
+          uploadedUrls.push(undefined);
+        }
+      }
+      if (failedUploads.length > 0) {
+        setUploadError(`Failed to upload: ${failedUploads.join(', ')}. Submitting without those images.`);
       }
 
       await apiFetch('/api/posts', {
@@ -108,9 +118,14 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
       setValueRating(0);
       setAuthenticityRating(0);
       setCrowdRating(0);
+      setUploadError(null);
 
       queryClient.invalidateQueries({ queryKey: ['myRankings'] });
       queryClient.invalidateQueries({ queryKey: ['feed'] });
+      queryClient.invalidateQueries({ queryKey: ['myPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['allMyPosts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['moments'] });
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create moment');
@@ -119,10 +134,33 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
     }
   };
 
+  // BUG 6: Prevent background scroll when modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  // BUG 6: Close modal on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
           <h3 className="text-lg font-bold gradient-text-135">New Moment</h3>
@@ -137,11 +175,11 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Describe your experience..."
-            maxLength={500}
+            maxLength={2000}
             rows={3}
             className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none resize-none bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
           />
-          <p className="text-xs text-gray-400 text-right -mt-2">{content.length}/500</p>
+          <p className="text-xs text-gray-400 text-right -mt-2">{content.length}/2000</p>
 
           {/* Photos */}
           <div>
@@ -168,6 +206,7 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
               )}
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileSelect} className="hidden" />
+            {uploadError && <p className="text-red-500 text-xs mt-1">{uploadError}</p>}
           </div>
 
           {/* Ratings */}

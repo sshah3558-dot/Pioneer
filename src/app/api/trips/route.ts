@@ -47,13 +47,29 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = querySchema.parse(Object.fromEntries(searchParams));
 
+    // Get current user ID if authenticated
+    let currentUserId: string | null = null;
+    if (session?.user?.email) {
+      const currentUser = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: { id: true },
+      });
+      currentUserId = currentUser?.id ?? null;
+    }
+
     // Build where clause
-    const where: Prisma.TripWhereInput = {
-      isPublic: true, // Only show public trips by default
-    };
+    const where: Prisma.TripWhereInput = {};
 
     if (query.userId) {
       where.userId = query.userId;
+      // If the requesting user is viewing their own trips, show all (including private)
+      // Otherwise, only show public trips
+      if (query.userId !== currentUserId) {
+        where.isPublic = true;
+      }
+    } else {
+      // No specific user requested — only show public trips
+      where.isPublic = true;
     }
 
     if (query.cityId) {

@@ -89,16 +89,16 @@ export function FeedCard({ activity, className }: FeedCardProps) {
   const getTags = () => {
     const tags: { label: string; color: string }[] = [];
     if (activity.rating) {
-      tags.push({ label: `⭐ ${activity.rating}/5`, color: 'bg-yellow-100 text-yellow-800' });
+      tags.push({ label: `⭐ ${activity.rating}/5`, color: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300' });
     }
     if (activity.place?.priceLevel === 'BUDGET') {
-      tags.push({ label: '💰 Budget Friendly', color: 'bg-green-100 text-green-800' });
+      tags.push({ label: '💰 Budget Friendly', color: 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300' });
     }
     if (activity.place?.tags?.includes('local-favorite')) {
-      tags.push({ label: '🌟 Hidden Gem', color: 'bg-purple-100 text-purple-800' });
+      tags.push({ label: '🌟 Hidden Gem', color: 'bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300' });
     }
     if (activity.type === 'photos_uploaded') {
-      tags.push({ label: `📸 ${activity.photoCount} Photos`, color: 'bg-blue-100 text-blue-800' });
+      tags.push({ label: `📸 ${activity.photoCount} Photos`, color: 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300' });
     }
     return tags;
   };
@@ -144,7 +144,7 @@ export function FeedCard({ activity, className }: FeedCardProps) {
                 className="w-full h-80 object-cover rounded-xl"
               />
             </Link>
-            {activity.post?.compositeScore && (
+            {activity.post?.compositeScore != null && (
               <div className="absolute top-3 right-3">
                 <ScoreBadge score={activity.post.compositeScore} size="md" />
               </div>
@@ -169,21 +169,21 @@ export function FeedCard({ activity, className }: FeedCardProps) {
         {/* Moment ratings */}
         {activity.post?.overallRating && (
           <div className="flex items-center gap-2 mb-4 flex-wrap">
-            <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-semibold">
+            <span className="bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 px-3 py-1 rounded-full text-xs font-semibold">
               Overall: {activity.post.overallRating}/5
             </span>
             {activity.post.valueRating && (
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">
+              <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-semibold">
                 Value: {activity.post.valueRating}/5
               </span>
             )}
             {activity.post.authenticityRating && (
-              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
+              <span className="bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 px-3 py-1 rounded-full text-xs font-semibold">
                 Authenticity: {activity.post.authenticityRating}/5
               </span>
             )}
             {activity.post.crowdRating && (
-              <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-xs font-semibold">
+              <span className="bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-300 px-3 py-1 rounded-full text-xs font-semibold">
                 Crowd: {activity.post.crowdRating}/5
               </span>
             )}

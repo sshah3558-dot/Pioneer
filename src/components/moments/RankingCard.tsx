@@ -51,7 +51,7 @@ export function RankingCard({ moment }: RankingCardProps) {
         </div>
 
         {/* Score badge */}
-        {moment.compositeScore && (
+        {moment.compositeScore != null && (
           <ScoreBadge score={moment.compositeScore} size="md" />
         )}
 

@@ -7,7 +7,7 @@ import { apiFetch } from '@/lib/api/fetcher';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
-export default function AllPostsPage() {
+export default function AllMomentsPage() {
   const { user } = useCurrentUser();
   const [page, setPage] = useState(1);
   const pageSize = 12;
@@ -43,9 +43,9 @@ export default function AllPostsPage() {
         <Link href="/profile" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h2 className="font-bold text-2xl gradient-text-135">All Posts</h2>
-        {data?.total && (
-          <span className="text-sm text-gray-500 dark:text-gray-400">({data.total} posts)</span>
+        <h2 className="font-bold text-2xl gradient-text-135">All Moments</h2>
+        {data?.total != null && data.total > 0 && (
+          <span className="text-sm text-gray-500 dark:text-gray-400">({data.total} moments)</span>
         )}
       </div>
 
@@ -64,7 +64,7 @@ export default function AllPostsPage() {
         </div>
       ) : posts.length === 0 ? (
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center">
-          <p className="text-gray-500 dark:text-gray-400 text-lg">No posts yet.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg">No moments yet.</p>
           <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Share your latest discovery on the feed!</p>
         </div>
       ) : (

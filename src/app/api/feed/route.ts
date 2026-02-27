@@ -114,6 +114,12 @@ export async function GET(request: NextRequest) {
         },
         include: {
           user: { select: userSelect },
+          place: {
+            select: {
+              id: true, name: true, category: true, imageUrl: true,
+              city: { select: { name: true, country: { select: { name: true } } } },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
       }),
@@ -191,9 +197,24 @@ export async function GET(request: NextRequest) {
         id: post.id,
         content: post.content,
         imageUrl: post.imageUrl,
+        imageUrl2: post.imageUrl2,
+        imageUrl3: post.imageUrl3,
+        overallRating: post.overallRating,
+        valueRating: post.valueRating,
+        authenticityRating: post.authenticityRating,
+        crowdRating: post.crowdRating,
+        compositeScore: post.compositeScore,
         likeCount: post.likeCount,
         user: post.user,
         createdAt: post.createdAt.toISOString(),
+        place: post.place ? {
+          id: post.place.id,
+          name: post.place.name,
+          category: post.place.category,
+          imageUrl: post.place.imageUrl,
+          cityName: post.place.city?.name,
+          countryName: post.place.city?.country?.name,
+        } : null,
       },
     }));
 

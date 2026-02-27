@@ -58,7 +58,7 @@ export function SavedMoments({ onAddToTrip }: SavedMomentsProps) {
       <div className="flex items-center gap-2 mb-4">
         <Bookmark className="w-5 h-5 text-purple-600 fill-purple-600" />
         <h3 className="font-bold text-lg dark:text-white">Saved Moments</h3>
-        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">
+        <span className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full font-medium">
           {moments.length}
         </span>
       </div>
@@ -88,13 +88,13 @@ export function SavedMoments({ onAddToTrip }: SavedMomentsProps) {
               </div>
 
               <div className="flex items-center gap-2 flex-shrink-0">
-                {moment.compositeScore && (
+                {moment.compositeScore != null && (
                   <ScoreBadge score={moment.compositeScore} size="sm" />
                 )}
                 {onAddToTrip && moment.place && (
                   <button
                     onClick={() => onAddToTrip(moment.id, moment.place!.name)}
-                    className="p-1.5 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors"
+                    className="p-1.5 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors"
                     title="Add to trip"
                   >
                     <Plus className="w-4 h-4" />

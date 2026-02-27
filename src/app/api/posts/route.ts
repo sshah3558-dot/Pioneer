@@ -16,10 +16,10 @@ const createPostSchema = z.object({
   imageUrl: z.string().url().optional(),
   imageUrl2: z.string().url().optional(),
   imageUrl3: z.string().url().optional(),
-  overallRating: z.number().min(1).max(5).optional(),
-  valueRating: z.number().min(1).max(5).optional(),
-  authenticityRating: z.number().min(1).max(5).optional(),
-  crowdRating: z.number().min(1).max(5).optional(),
+  overallRating: z.number().int().min(1).max(5).optional(),
+  valueRating: z.number().int().min(1).max(5).optional(),
+  authenticityRating: z.number().int().min(1).max(5).optional(),
+  crowdRating: z.number().int().min(1).max(5).optional(),
   placeId: z.string().optional(),
 });
 

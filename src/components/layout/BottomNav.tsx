@@ -63,7 +63,7 @@ export function BottomNav() {
         })}
       </div>
       {/* Safe area padding for notched devices */}
-      <div className="h-safe-area-inset-bottom bg-white dark:bg-gray-900" />
+      <div className="bg-white dark:bg-gray-900" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
     </nav>
   );
 }

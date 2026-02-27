@@ -9,22 +9,35 @@ interface ProfileHeaderProps {
   isOwnProfile?: boolean;
   onFollow?: () => void;
   isFollowing?: boolean;
+  momentCount?: number;
+  avgRating?: number | null;
 }
 
-const achievementBadges = [
-  { label: '🌟 Top Reviewer', gradient: 'from-yellow-400 to-orange-500' },
-  { label: '🗺️ Globe Trotter', gradient: 'from-blue-400 to-purple-500' },
-  { label: '💎 Hidden Gem Hunter', gradient: 'from-green-400 to-emerald-500' },
-  { label: '📸 Photography Pro', gradient: 'from-pink-400 to-red-500' },
-];
+function getAchievementBadges(user: UserProfile, momentCount?: number): { label: string; gradient: string }[] {
+  const badges: { label: string; gradient: string }[] = [];
+  if (user.reviewCount >= 10) {
+    badges.push({ label: 'Top Reviewer', gradient: 'from-yellow-400 to-orange-500' });
+  }
+  if (user.tripCount >= 5) {
+    badges.push({ label: 'Globe Trotter', gradient: 'from-blue-400 to-purple-500' });
+  }
+  if ((momentCount ?? 0) >= 10) {
+    badges.push({ label: 'Storyteller', gradient: 'from-green-400 to-emerald-500' });
+  }
+  if (user.followerCount >= 100) {
+    badges.push({ label: 'Influencer', gradient: 'from-pink-400 to-red-500' });
+  }
+  return badges;
+}
 
 export function ProfileHeader({
   user,
   isOwnProfile = false,
   onFollow,
   isFollowing = false,
+  momentCount,
+  avgRating,
 }: ProfileHeaderProps) {
-  const avgRating = 4.8; // Mock
 
   const joinYear = new Date(user.createdAt).getFullYear();
 
@@ -88,7 +101,7 @@ export function ProfileHeader({
           <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Reviews</div>
         </div>
         <div className="stat-card dark:bg-gray-800 rounded-xl p-2 sm:p-4 text-center">
-          <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{user.tripCount}</div>
+          <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{momentCount ?? 0}</div>
           <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Moments</div>
         </div>
         <div className="stat-card dark:bg-gray-800 rounded-xl p-2 sm:p-4 text-center">
@@ -104,25 +117,31 @@ export function ProfileHeader({
           <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Following</div>
         </div>
         <div className="stat-card dark:bg-gray-800 rounded-xl p-2 sm:p-4 text-center hidden md:block">
-          <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{avgRating}</div>
+          <div className="text-xl sm:text-2xl md:text-3xl font-bold gradient-text-135">{avgRating != null ? avgRating.toFixed(1) : 'N/A'}</div>
           <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Avg Rating</div>
         </div>
       </div>
 
       {/* Achievement Badges */}
-      <div className="px-4 sm:px-6 py-4">
-        <h3 className="font-bold text-lg sm:text-xl mb-3 gradient-text-135">Achievements</h3>
-        <div className="flex gap-2 sm:gap-3 flex-wrap">
-          {achievementBadges.map((badge) => (
-            <div
-              key={badge.label}
-              className={`animate-float bg-gradient-to-br ${badge.gradient} text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg`}
-            >
-              {badge.label}
+      {(() => {
+        const badges = getAchievementBadges(user, momentCount);
+        if (badges.length === 0) return null;
+        return (
+          <div className="px-4 sm:px-6 py-4">
+            <h3 className="font-bold text-lg sm:text-xl mb-3 gradient-text-135">Achievements</h3>
+            <div className="flex gap-2 sm:gap-3 flex-wrap">
+              {badges.map((badge) => (
+                <div
+                  key={badge.label}
+                  className={`animate-float bg-gradient-to-br ${badge.gradient} text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg`}
+                >
+                  {badge.label}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

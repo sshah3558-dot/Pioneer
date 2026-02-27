@@ -92,17 +92,17 @@ export function CreateTripModal({ isOpen, onClose, onCreated }: CreateTripModalP
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold gradient-text-135">Create New Trip</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Trip Title</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Trip Title</label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -112,10 +112,10 @@ export function CreateTripModal({ isOpen, onClose, onCreated }: CreateTripModalP
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
             {selectedCity ? (
-              <div className="flex items-center gap-2 p-3 bg-purple-50 rounded-xl">
-                <span className="font-semibold text-purple-700">
+              <div className="flex items-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
+                <span className="font-semibold text-purple-700 dark:text-purple-300">
                   {selectedCity.name}
                   {selectedCity.country ? `, ${selectedCity.country.name}` : ''}
                 </span>
@@ -125,7 +125,7 @@ export function CreateTripModal({ isOpen, onClose, onCreated }: CreateTripModalP
                     setSelectedCity(null);
                     setCitySearch('');
                   }}
-                  className="ml-auto text-gray-400 hover:text-gray-600"
+                  className="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -138,7 +138,7 @@ export function CreateTripModal({ isOpen, onClose, onCreated }: CreateTripModalP
                   placeholder="Search for a city..."
                 />
                 {cities.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
                     {cities.map((city) => (
                       <button
                         key={city.id}
@@ -148,7 +148,7 @@ export function CreateTripModal({ isOpen, onClose, onCreated }: CreateTripModalP
                           setCitySearch('');
                           setCities([]);
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm"
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-gray-900 dark:text-gray-100"
                       >
                         {city.name}{city.country ? `, ${city.country.name}` : ''}
                       </button>
@@ -161,7 +161,7 @@ export function CreateTripModal({ isOpen, onClose, onCreated }: CreateTripModalP
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
               <Input
                 type="date"
                 value={startDate}
@@ -169,7 +169,7 @@ export function CreateTripModal({ isOpen, onClose, onCreated }: CreateTripModalP
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
               <Input
                 type="date"
                 value={endDate}
@@ -179,18 +179,18 @@ export function CreateTripModal({ isOpen, onClose, onCreated }: CreateTripModalP
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (optional)</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What are you excited about?"
               rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+              className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm">
               {error}
             </div>
           )}
