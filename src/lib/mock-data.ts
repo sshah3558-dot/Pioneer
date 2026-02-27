@@ -273,7 +273,7 @@ export interface FeedActivity {
   photoCount?: number;
   rating?: number;
   follow?: { follower: UserPreview; following: UserPreview };
-  post?: { id: string; content: string; imageUrl: string | null; likeCount: number; user: UserPreview; createdAt: string; compositeScore?: number | null; overallRating?: number | null; valueRating?: number | null; authenticityRating?: number | null; crowdRating?: number | null };
+  post?: { id: string; content: string; imageUrl: string | null; imageUrl2?: string | null; imageUrl3?: string | null; likeCount: number; user: UserPreview; createdAt: string; compositeScore?: number | null; overallRating?: number | null; valueRating?: number | null; authenticityRating?: number | null; crowdRating?: number | null };
 }
 
 export const mockFeedActivities: FeedActivity[] = [
