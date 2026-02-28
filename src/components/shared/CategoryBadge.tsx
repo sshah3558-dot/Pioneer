@@ -65,7 +65,7 @@ export function TagBadge({
         'font-normal rounded-full',
         sizes[size],
         variant === 'gradient' && 'gradient-primary text-white border-0',
-        variant === 'default' && 'bg-gray-100 text-gray-600 border-gray-200',
+        variant === 'default' && 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700',
         className
       )}
     >

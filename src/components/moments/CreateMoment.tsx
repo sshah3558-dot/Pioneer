@@ -1,11 +1,19 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import { apiFetch } from '@/lib/api/fetcher';
-import { X, Image as ImageIcon, Loader2, Star, MapPin } from 'lucide-react';
+import { X, Image as ImageIcon, Loader2, Star, MapPin, Search } from 'lucide-react';
+
+interface PlaceOption {
+  id: string;
+  name: string;
+  cityName: string;
+  countryName: string;
+  category: string;
+}
 
 interface CreateMomentProps {
   isOpen: boolean;
@@ -54,6 +62,52 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [placeSearch, setPlaceSearch] = useState('');
+  const [placeResults, setPlaceResults] = useState<PlaceOption[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceOption | null>(null);
+  const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
+  const [showPlaceDropdown, setShowPlaceDropdown] = useState(false);
+  const placePickerRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const searchPlaces = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setPlaceResults([]);
+      setShowPlaceDropdown(false);
+      return;
+    }
+    setIsSearchingPlaces(true);
+    try {
+      const res = await apiFetch<{ places: PlaceOption[] }>(`/api/places?search=${encodeURIComponent(query)}&pageSize=10`);
+      setPlaceResults(res.places || []);
+      setShowPlaceDropdown(true);
+    } catch {
+      setPlaceResults([]);
+    } finally {
+      setIsSearchingPlaces(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!placeSearch.trim()) {
+      setPlaceResults([]);
+      setShowPlaceDropdown(false);
+      return;
+    }
+    debounceRef.current = setTimeout(() => searchPlaces(placeSearch), 300);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [placeSearch, searchPlaces]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (placePickerRef.current && !placePickerRef.current.contains(e.target as Node)) {
+        setShowPlaceDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -103,6 +157,7 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
           imageUrl: uploadedUrls[0],
           imageUrl2: uploadedUrls[1],
           imageUrl3: uploadedUrls[2],
+          placeId: selectedPlace?.id || undefined,
           overallRating,
           valueRating: valueRating || undefined,
           authenticityRating: authenticityRating || undefined,
@@ -119,6 +174,10 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
       setAuthenticityRating(0);
       setCrowdRating(0);
       setUploadError(null);
+      setSelectedPlace(null);
+      setPlaceSearch('');
+      setPlaceResults([]);
+      setShowPlaceDropdown(false);
 
       queryClient.invalidateQueries({ queryKey: ['myRankings'] });
       queryClient.invalidateQueries({ queryKey: ['feed'] });
@@ -180,6 +239,64 @@ export function CreateMoment({ isOpen, onClose }: CreateMomentProps) {
             className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none resize-none bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
           />
           <p className="text-xs text-gray-400 text-right -mt-2">{content.length}/2000</p>
+
+          {/* Place Picker */}
+          <div ref={placePickerRef} className="relative">
+            {selectedPlace ? (
+              <div className="flex items-center gap-2 px-3 py-2 border-2 border-purple-300 dark:border-purple-600 rounded-xl bg-purple-50 dark:bg-purple-900/20">
+                <MapPin className="w-4 h-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                <span className="text-sm font-medium text-purple-700 dark:text-purple-300 truncate">
+                  {selectedPlace.name}
+                  {selectedPlace.cityName && <span className="text-purple-500 dark:text-purple-400 font-normal">, {selectedPlace.cityName}</span>}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => { setSelectedPlace(null); setPlaceSearch(''); }}
+                  className="ml-auto p-0.5 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-full flex-shrink-0"
+                >
+                  <X className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                </button>
+              </div>
+            ) : (
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={placeSearch}
+                  onChange={(e) => setPlaceSearch(e.target.value)}
+                  placeholder="Search for a place..."
+                  className="w-full pl-9 pr-8 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none text-sm bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                />
+                {isSearchingPlaces && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                )}
+              </div>
+            )}
+            {showPlaceDropdown && placeResults.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                {placeResults.map((place) => (
+                  <button
+                    key={place.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPlace(place);
+                      setPlaceSearch('');
+                      setShowPlaceDropdown(false);
+                    }}
+                    className="w-full text-left px-3 py-2.5 hover:bg-purple-50 dark:hover:bg-purple-900/20 flex items-center gap-2 transition-colors"
+                  >
+                    <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{place.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {[place.cityName, place.countryName].filter(Boolean).join(', ')}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Photos */}
           <div>

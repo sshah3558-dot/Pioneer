@@ -52,6 +52,12 @@ export default function ProfilePage() {
 
   const posts = postsData?.items || [];
 
+  // Compute average composite rating from all scored moments
+  const ratedPosts = posts.filter((p) => p.compositeScore != null);
+  const avgRating = ratedPosts.length > 0
+    ? ratedPosts.reduce((sum, p) => sum + p.compositeScore!, 0) / ratedPosts.length
+    : undefined;
+
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -64,7 +70,7 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <ProfileHeader user={user} isOwnProfile momentCount={postsData?.total} />
+      <ProfileHeader user={user} isOwnProfile momentCount={postsData?.total} avgRating={avgRating} />
 
       {/* My Moments */}
       <div className="flex items-center justify-between">

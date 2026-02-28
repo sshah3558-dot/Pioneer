@@ -428,11 +428,11 @@ export interface SearchResponse {
 }
 
 // ============================================
-// POST ENDPOINTS
+// MOMENT ENDPOINTS
 // ============================================
 
 // POST /api/posts
-export interface CreatePostRequest {
+export interface CreateMomentRequest {
   content: string;
   imageUrl?: string;
   imageUrl2?: string;
@@ -444,7 +444,7 @@ export interface CreatePostRequest {
   placeId?: string;
 }
 
-export interface CreatePostResponse {
+export interface CreateMomentResponse {
   post: {
     id: string;
     content: string;

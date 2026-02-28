@@ -106,7 +106,7 @@ export async function getRecommendedMomentIds(
     const ageDays = ageMs / DAY_MS;
     score += Math.exp(-ageDays / 10);
 
-    score += (m.compositeScore || 0) / 10;
+    score += (m.compositeScore ?? 0) / 10;
 
     return { postId: m.id, score };
   });

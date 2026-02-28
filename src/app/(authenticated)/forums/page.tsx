@@ -43,7 +43,7 @@ export default function RankingsPage() {
     .filter(m => m.compositeScore !== null)
     .sort((a, b) => (a.rank || 999) - (b.rank || 999));
 
-  const unrankedPosts = (data?.items || []).filter(m => m.compositeScore === null);
+  const unrankedMoments = (data?.items || []).filter(m => m.compositeScore === null);
 
   return (
     <div className="animate-fade-in max-w-3xl mx-auto">
@@ -79,7 +79,7 @@ export default function RankingsPage() {
             </div>
           ))}
         </div>
-      ) : moments.length === 0 && unrankedPosts.length === 0 ? (
+      ) : moments.length === 0 && unrankedMoments.length === 0 ? (
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-12 text-center">
           <Trophy className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
           <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">No moments yet</p>
@@ -92,22 +92,31 @@ export default function RankingsPage() {
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {moments.map((moment) => (
-            <RankingCard key={moment.id} moment={moment} />
-          ))}
-        </div>
+        <>
+          {moments.length > 0 ? (
+            <div className="space-y-3">
+              {moments.map((moment) => (
+                <RankingCard key={moment.id} moment={moment} />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 text-center">
+              <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">No ranked moments yet</p>
+              <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Add ratings to your moments to see them ranked here.</p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Unranked Moments */}
-      {!isLoading && unrankedPosts.length > 0 && (
+      {!isLoading && unrankedMoments.length > 0 && (
         <div className="mt-8">
           <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-1">Unranked Moments</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Add ratings to these moments to include them in your rankings.
           </p>
           <div className="space-y-3">
-            {unrankedPosts.map((moment) => (
+            {unrankedMoments.map((moment) => (
               <div key={moment.id} className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden card-hover">
                 <div className="flex items-center gap-4 p-4">
                   {/* No rank number for unranked */}

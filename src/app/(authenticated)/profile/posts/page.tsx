@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { apiFetch } from '@/lib/api/fetcher';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MapPin, Star } from 'lucide-react';
 
 export default function AllMomentsPage() {
   const { user } = useCurrentUser();
@@ -18,8 +18,20 @@ export default function AllMomentsPage() {
       id: string;
       content: string;
       imageUrl: string | null;
+      imageUrl2: string | null;
+      imageUrl3: string | null;
       likeCount: number;
+      compositeScore: number | null;
+      rank: number | null;
       createdAt: string;
+      place: {
+        id: string;
+        name: string;
+        category: string;
+        imageUrl: string | null;
+        cityName: string;
+        countryName: string;
+      } | null;
     }>, total: number, hasMore: boolean }>(`/api/posts?userId=me&page=${page}&pageSize=${pageSize}`),
     enabled: !!user,
   });
@@ -73,9 +85,31 @@ export default function AllMomentsPage() {
             {posts.map((post) => (
               <div key={post.id} className="card-hover bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
                 {post.imageUrl && (
-                  <img src={post.imageUrl} alt="" className="w-full h-48 object-cover" />
+                  <div className="relative">
+                    <img src={post.imageUrl} alt="" className="w-full h-48 object-cover" />
+                    {post.compositeScore != null && (
+                      <div className="absolute top-2 right-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-white" />
+                        {post.compositeScore.toFixed(1)}
+                      </div>
+                    )}
+                  </div>
+                )}
+                {!post.imageUrl && post.compositeScore != null && (
+                  <div className="px-5 pt-4">
+                    <span className="bg-gradient-to-r from-purple-600 to-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-white" />
+                      {post.compositeScore.toFixed(1)}
+                    </span>
+                  </div>
                 )}
                 <div className="p-5">
+                  {post.place && (
+                    <p className="text-xs text-purple-600 dark:text-purple-400 font-medium flex items-center gap-1 mb-1.5">
+                      <MapPin className="w-3 h-3" />
+                      {post.place.name}{post.place.cityName ? `, ${post.place.cityName}` : ''}
+                    </p>
+                  )}
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs text-gray-500 dark:text-gray-400">{timeAgo(post.createdAt)}</span>
                     {post.likeCount > 0 && (
