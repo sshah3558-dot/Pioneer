@@ -68,12 +68,12 @@ export async function GET(request: NextRequest) {
           userId: { in: feedUserIds },
           isPublic: true,
         },
-        include: {
+        select: {
+          id: true, title: true, coverImageUrl: true, startDate: true,
+          endDate: true, likeCount: true, status: true, createdAt: true,
           user: { select: userSelect },
           city: {
-            include: {
-              country: true,
-            },
+            select: { name: true, country: { select: { name: true } } },
           },
           _count: {
             select: { stops: true },
@@ -87,9 +87,18 @@ export async function GET(request: NextRequest) {
         where: {
           userId: { in: feedUserIds },
         },
-        include: {
+        select: {
+          id: true, overallRating: true, title: true, content: true,
+          likeCount: true, createdAt: true,
           user: { select: userSelect },
-          place: { include: { city: { include: { country: true } } } },
+          place: {
+            select: {
+              id: true, name: true, category: true, imageUrl: true,
+              neighborhood: true, avgOverallRating: true, totalReviewCount: true,
+              priceLevel: true,
+              city: { select: { name: true, country: { select: { name: true } } } },
+            },
+          },
           _count: { select: { photos: true } },
         },
         orderBy: { createdAt: 'desc' },
@@ -100,7 +109,8 @@ export async function GET(request: NextRequest) {
         where: {
           followerId: { in: followingIds },
         },
-        include: {
+        select: {
+          id: true, createdAt: true,
           follower: { select: userSelect },
           following: { select: userSelect },
         },
@@ -112,7 +122,10 @@ export async function GET(request: NextRequest) {
         where: {
           userId: { in: feedUserIds },
         },
-        include: {
+        select: {
+          id: true, content: true, imageUrl: true, imageUrl2: true, imageUrl3: true,
+          overallRating: true, valueRating: true, authenticityRating: true,
+          crowdRating: true, compositeScore: true, likeCount: true, createdAt: true,
           user: { select: userSelect },
           place: {
             select: {

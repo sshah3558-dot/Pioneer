@@ -96,12 +96,13 @@ export async function GET(request: NextRequest) {
     const [places, total] = await Promise.all([
       prisma.place.findMany({
         where,
-        include: {
-          tags: true,
+        select: {
+          id: true, name: true, category: true, imageUrl: true,
+          neighborhood: true, avgOverallRating: true, totalReviewCount: true,
+          priceLevel: true, latitude: true, longitude: true,
+          tags: { select: { tag: true } },
           city: {
-            include: {
-              country: true,
-            },
+            select: { name: true, country: { select: { name: true } } },
           },
         },
         skip: (query.page - 1) * query.pageSize,
@@ -184,7 +185,9 @@ export async function GET(request: NextRequest) {
       hasMore: query.page * query.pageSize < total,
     };
 
-    return NextResponse.json(response);
+    const jsonResponse = NextResponse.json(response);
+    jsonResponse.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    return jsonResponse;
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

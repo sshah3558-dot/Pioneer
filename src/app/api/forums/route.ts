@@ -5,14 +5,15 @@ import { prisma } from '@/lib/db/prisma';
 export async function GET() {
   try {
     const forums = await prisma.forum.findMany({
-      include: {
+      select: {
+        id: true, name: true, slug: true, description: true, postCount: true,
         country: { select: { name: true } },
         city: { select: { name: true } },
       },
       orderBy: { postCount: 'desc' },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       forums: forums.map((f) => ({
         id: f.id,
         name: f.name,
@@ -23,6 +24,8 @@ export async function GET() {
         cityName: f.city?.name,
       })),
     });
+    response.headers.set('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1200');
+    return response;
   } catch (error) {
     console.error('GET /api/forums error:', error);
     return NextResponse.json(

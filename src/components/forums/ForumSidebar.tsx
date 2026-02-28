@@ -20,6 +20,7 @@ export function ForumSidebar({ activeSlug, onSelectForum }: ForumSidebarProps) {
   const { data, isLoading } = useQuery({
     queryKey: ['forums'],
     queryFn: () => apiFetch<{ forums: ForumItem[] }>('/api/forums'),
+    staleTime: Infinity,
   });
 
   const forums = data?.forums || [];

@@ -6,16 +6,22 @@ import { prisma } from '@/lib/db/prisma';
 import { getRecommendedMomentIds } from '@/lib/ai/recommendations';
 import { Prisma } from '@prisma/client';
 
+const momentSelect = {
+  id: true, content: true, imageUrl: true, imageUrl2: true, imageUrl3: true,
+  overallRating: true, valueRating: true, authenticityRating: true,
+  crowdRating: true, compositeScore: true, rank: true, likeCount: true,
+  viewCount: true, createdAt: true,
+  user: { select: { id: true, name: true, username: true, avatarUrl: true } },
+  place: {
+    select: {
+      id: true, name: true, category: true, imageUrl: true,
+      city: { select: { name: true, country: { select: { name: true } } } },
+    },
+  },
+} as const;
+
 type MomentWithRelations = Prisma.PostGetPayload<{
-  include: {
-    user: { select: { id: true; name: true; username: true; avatarUrl: true } };
-    place: {
-      select: {
-        id: true; name: true; category: true; imageUrl: true;
-        city: { select: { name: true; country: { select: { name: true } } } };
-      };
-    };
-  };
+  select: typeof momentSelect;
 }>;
 
 const querySchema = z.object({
@@ -55,18 +61,8 @@ export async function GET(request: NextRequest) {
     if (query.saved === 'true') {
       const saves = await prisma.momentSave.findMany({
         where: { userId: currentUser.id },
-        include: {
-          post: {
-            include: {
-              user: { select: { id: true, name: true, username: true, avatarUrl: true } },
-              place: {
-                select: {
-                  id: true, name: true, category: true, imageUrl: true,
-                  city: { select: { name: true, country: { select: { name: true } } } },
-                },
-              },
-            },
-          },
+        select: {
+          post: { select: momentSelect },
         },
         orderBy: { savedAt: 'desc' },
       });
@@ -142,15 +138,7 @@ export async function GET(request: NextRequest) {
       };
       moments = await prisma.post.findMany({
         where: recommendedWhere,
-        include: {
-          user: { select: { id: true, name: true, username: true, avatarUrl: true } },
-          place: {
-            select: {
-              id: true, name: true, category: true, imageUrl: true,
-              city: { select: { name: true, country: { select: { name: true } } } },
-            },
-          },
-        },
+        select: momentSelect,
       });
       // Preserve recommendation order
       const orderMap = new Map(specificIds.map((id, i) => [id, i]));
@@ -160,15 +148,7 @@ export async function GET(request: NextRequest) {
       [moments, total] = await Promise.all([
         prisma.post.findMany({
           where,
-          include: {
-            user: { select: { id: true, name: true, username: true, avatarUrl: true } },
-            place: {
-              select: {
-                id: true, name: true, category: true, imageUrl: true,
-                city: { select: { name: true, country: { select: { name: true } } } },
-              },
-            },
-          },
+          select: momentSelect,
           orderBy,
           skip: (query.page - 1) * query.pageSize,
           take: query.pageSize,

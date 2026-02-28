@@ -60,7 +60,11 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         skip: (query.page - 1) * query.pageSize,
         take: query.pageSize,
-        include: {
+        select: {
+          id: true, content: true, imageUrl: true, imageUrl2: true, imageUrl3: true,
+          likeCount: true, viewCount: true, overallRating: true, valueRating: true,
+          authenticityRating: true, crowdRating: true, compositeScore: true,
+          rank: true, createdAt: true,
           place: {
             select: {
               id: true, name: true, category: true, imageUrl: true,

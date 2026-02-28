@@ -11,14 +11,18 @@ export async function GET(request: NextRequest) {
       where: search
         ? { name: { contains: search, mode: 'insensitive' } }
         : { active: true },
-      include: {
+      select: {
+        id: true,
+        name: true,
         country: { select: { name: true } },
       },
       orderBy: { name: 'asc' },
       take: 20,
     });
 
-    return NextResponse.json({ cities });
+    const response = NextResponse.json({ cities });
+    response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200');
+    return response;
   } catch (error) {
     console.error('GET /api/cities error:', error);
     return NextResponse.json(
