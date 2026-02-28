@@ -67,6 +67,10 @@ model User {
   tripLikes          TripLike[]
   momentSaves        MomentSave[]
 
+  // Behavioral tracking
+  events               UserEvent[]            @relation("UserEvents")
+  recommendationScores RecommendationScore[]  @relation("RecommendationScores")
+
   @@map("users")
 }
 
@@ -497,6 +501,7 @@ model Post {
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   place Place? @relation(fields: [placeId], references: [id])
   saves MomentSave[]
+  recommendationScores RecommendationScore[] @relation("RecommendationScores")
 
   @@index([userId])
   @@index([createdAt])
@@ -641,4 +646,58 @@ model ForumComment {
 
   @@index([postId])
   @@map("forum_comments")
+}
+
+// ============================================
+// BEHAVIORAL TRACKING
+// ============================================
+
+enum EventType {
+  VIEW
+  SAVE
+  UNSAVE
+  LIKE
+  UNLIKE
+  CLICK
+  SEARCH
+  FILTER_CHANGE
+  SHARE
+}
+
+enum TargetType {
+  MOMENT
+  PLACE
+  TRIP
+  USER
+}
+
+model UserEvent {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation("UserEvents", fields: [userId], references: [id], onDelete: Cascade)
+  eventType  EventType
+  targetId   String?
+  targetType TargetType?
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+
+  @@index([userId, eventType, createdAt])
+  @@index([targetId, targetType])
+  @@index([createdAt])
+  @@map("user_events")
+}
+
+model RecommendationScore {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation("RecommendationScores", fields: [userId], references: [id], onDelete: Cascade)
+  momentId   String
+  moment     Post     @relation("RecommendationScores", fields: [momentId], references: [id], onDelete: Cascade)
+  score      Float
+  factors    Json?
+  computedAt DateTime @default(now())
+
+  @@unique([userId, momentId])
+  @@index([userId, score])
+  @@map("recommendation_scores")
 }

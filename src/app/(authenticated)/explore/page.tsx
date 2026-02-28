@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Sparkles, Eye, TrendingUp } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { MomentCard } from '@/components/moments/MomentCard';
 import { apiFetch } from '@/lib/api/fetcher';
+import { tracker } from '@/lib/tracking/event-tracker';
 
 type FilterType = 'recommended' | 'mostViewed' | 'topRated';
 
@@ -22,9 +23,26 @@ export default function ExplorePage() {
   const [country, setCountry] = useState('');
 
   useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedSearch(searchInput), 300);
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      if (searchInput) {
+        tracker?.track('SEARCH', undefined, undefined, { query: searchInput });
+      }
+    }, 300);
     return () => clearTimeout(timeout);
   }, [searchInput]);
+
+  const handleFilterChange = useCallback((filter: FilterType) => {
+    setActiveFilter(filter);
+    tracker?.track('FILTER_CHANGE', undefined, undefined, { filter });
+  }, []);
+
+  const handleCountryChange = useCallback((newCountry: string) => {
+    setCountry(newCountry);
+    if (newCountry) {
+      tracker?.track('FILTER_CHANGE', undefined, undefined, { filter: activeFilter, country: newCountry });
+    }
+  }, [activeFilter]);
 
   const queryParams = new URLSearchParams();
   queryParams.set('filter', activeFilter);
@@ -90,7 +108,7 @@ export default function ExplorePage() {
         {filters.map((f) => (
           <button
             key={f.value}
-            onClick={() => setActiveFilter(f.value)}
+            onClick={() => handleFilterChange(f.value)}
             className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
               activeFilter === f.value
                 ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-md'
@@ -107,7 +125,7 @@ export default function ExplorePage() {
           type="text"
           placeholder="Filter by country..."
           value={country}
-          onChange={(e) => setCountry(e.target.value)}
+          onChange={(e) => handleCountryChange(e.target.value)}
           className="px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none w-36 sm:w-48"
         />
       </div>
