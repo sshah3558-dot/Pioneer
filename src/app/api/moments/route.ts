@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { getRecommendedMomentIds } from '@/lib/ai/recommendations';
+import { refreshRecommendationsForUser } from '@/lib/ai/compute-recommendations';
 import { Prisma } from '@prisma/client';
 
 const momentSelect = {
@@ -114,12 +115,26 @@ export async function GET(request: NextRequest) {
       orderBy = { viewCount: 'desc' };
     } else if (query.filter === 'recommended') {
       try {
-        const rec = await getRecommendedMomentIds(
-          currentUser.id,
-          query.pageSize,
-          (query.page - 1) * query.pageSize,
-        );
-        specificIds = rec.ids;
+        // Try pre-computed recommendation scores first
+        const precomputed = await prisma.recommendationScore.findMany({
+          where: { userId: currentUser.id },
+          orderBy: { score: 'desc' },
+          select: { momentId: true },
+          skip: (query.page - 1) * query.pageSize,
+          take: query.pageSize,
+        });
+
+        if (precomputed.length > 0) {
+          specificIds = precomputed.map(r => r.momentId);
+        } else {
+          // Fallback to legacy inline algorithm for cold start
+          const rec = await getRecommendedMomentIds(
+            currentUser.id,
+            query.pageSize,
+            (query.page - 1) * query.pageSize,
+          );
+          specificIds = rec.ids;
+        }
       } catch {
         orderBy = { compositeScore: 'desc' };
       }
@@ -164,6 +179,11 @@ export async function GET(request: NextRequest) {
         select: { postId: true },
       })).map(s => s.postId)
     );
+
+    // Fire-and-forget: refresh pre-computed recommendations in the background
+    if (query.filter === 'recommended' && currentUser) {
+      refreshRecommendationsForUser(currentUser.id).catch(() => {});
+    }
 
     return NextResponse.json({
       items: moments.map(m => ({
