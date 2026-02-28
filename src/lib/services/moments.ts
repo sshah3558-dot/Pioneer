@@ -6,10 +6,12 @@ export function computeCompositeScore(
   authenticity?: number | null,
   crowd?: number | null,
 ): number {
-  const v = value ?? overall;
-  const a = authenticity ?? overall;
-  const c = crowd ?? overall;
-  const raw = overall * 0.4 + v * 0.2 + a * 0.2 + c * 0.2;
+  const clamp = (n: number) => Math.min(5, Math.max(1, n));
+  const o = clamp(overall);
+  const v = clamp(value ?? overall);
+  const a = clamp(authenticity ?? overall);
+  const c = clamp(crowd ?? overall);
+  const raw = o * 0.4 + v * 0.2 + a * 0.2 + c * 0.2;
   return Math.round(raw * 2 * 10) / 10;
 }
 

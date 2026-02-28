@@ -6,6 +6,7 @@ import { Heart, MapPin, Calendar, MoreHorizontal } from 'lucide-react';
 import { TripCard as TripCardType } from '@/types/trip';
 import { Avatar } from '@/components/shared/UserPreview';
 import { cn } from '@/lib/utils';
+import { formatMonthYear } from '@/lib/utils/date';
 import { useState } from 'react';
 
 interface TripCardProps {
@@ -25,14 +26,6 @@ export function TripCard({ trip, variant = 'default', className, onLike }: TripC
     setIsLiked(!isLiked);
     setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
     onLike?.(trip.id);
-  };
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return null;
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      year: 'numeric',
-    });
   };
 
   const statusColors = {
@@ -143,7 +136,7 @@ export function TripCard({ trip, variant = 'default', className, onLike }: TripC
             {trip.startDate && (
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                {formatDate(trip.startDate)}
+                {formatMonthYear(trip.startDate)}
               </span>
             )}
             <span>{trip.stopCount} stops</span>

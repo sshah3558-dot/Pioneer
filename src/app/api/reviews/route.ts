@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const placeId = searchParams.get('placeId');
-    const page = parseInt(searchParams.get('page') || '1');
-    const pageSize = parseInt(searchParams.get('pageSize') || '10');
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get('pageSize') || '10')));
 
     const where: Record<string, unknown> = {};
 
@@ -197,7 +197,11 @@ export async function POST(request: NextRequest) {
     });
 
     // Update place aggregate ratings
-    await updatePlaceRatings(data.placeId);
+    try {
+      await updatePlaceRatings(data.placeId);
+    } catch (err) {
+      console.error('Failed to update place ratings:', err);
+    }
 
     const response: CreateReviewResponse = {
       review: {

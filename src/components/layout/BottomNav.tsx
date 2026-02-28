@@ -62,7 +62,7 @@ export function BottomNav() {
           );
         })}
       </div>
-      {/* Safe area padding for notched devices */}
+      {/* env() safe-area-inset-bottom requires inline style — no Tailwind v4 utility available */}
       <div className="bg-white dark:bg-gray-900" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
     </nav>
   );

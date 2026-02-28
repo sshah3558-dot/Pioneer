@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { z } from 'zod';
+import { EventType, TargetType, Prisma } from '@prisma/client';
 
 const eventSchema = z.object({
   eventType: z.enum(['VIEW', 'SAVE', 'UNSAVE', 'LIKE', 'UNLIKE', 'CLICK', 'SEARCH', 'FILTER_CHANGE', 'SHARE']),
@@ -50,10 +51,10 @@ export async function POST(request: NextRequest) {
   prisma.userEvent.createMany({
     data: parsed.data.events.map((event) => ({
       userId: user.id,
-      eventType: event.eventType as any,
+      eventType: event.eventType as EventType,
       targetId: event.targetId,
-      targetType: event.targetType as any,
-      metadata: (event.metadata ?? undefined) as any,
+      targetType: event.targetType as TargetType,
+      metadata: event.metadata ? event.metadata as Prisma.InputJsonValue : undefined,
     })),
   }).catch((err) => console.error('Event tracking error:', err));
 

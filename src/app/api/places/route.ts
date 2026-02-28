@@ -27,8 +27,8 @@ const querySchema = z.object({
   nearLongitude: z.coerce.number().optional(),
   radiusKm: z.coerce.number().optional(),
   search: z.string().optional(),
-  page: z.coerce.number().default(1),
-  pageSize: z.coerce.number().max(50).default(20),
+  page: z.coerce.number().min(1).default(1),
+  pageSize: z.coerce.number().min(1).max(50).default(20),
   sortBy: z.enum(['distance', 'rating', 'recent', 'reviews']).optional(),
 });
 

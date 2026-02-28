@@ -115,19 +115,27 @@ export async function computeRecommendationsForUser(userId: string): Promise<Sco
   return scored;
 }
 
-export async function refreshRecommendationsForUser(userId: string): Promise<void> {
-  const scored = await computeRecommendationsForUser(userId);
-  if (scored.length === 0) return;
+const refreshingUsers = new Set<string>();
 
-  await prisma.$transaction([
-    prisma.recommendationScore.deleteMany({ where: { userId } }),
-    prisma.recommendationScore.createMany({
-      data: scored.map(s => ({
-        userId,
-        momentId: s.momentId,
-        score: s.score,
-        factors: s.factors as unknown as Prisma.InputJsonValue,
-      })),
-    }),
-  ]);
+export async function refreshRecommendationsForUser(userId: string): Promise<void> {
+  if (refreshingUsers.has(userId)) return; // skip if already refreshing
+  refreshingUsers.add(userId);
+  try {
+    const scored = await computeRecommendationsForUser(userId);
+    if (scored.length === 0) return;
+
+    await prisma.$transaction([
+      prisma.recommendationScore.deleteMany({ where: { userId } }),
+      prisma.recommendationScore.createMany({
+        data: scored.map(s => ({
+          userId,
+          momentId: s.momentId,
+          score: s.score,
+          factors: s.factors as unknown as Prisma.InputJsonValue,
+        })),
+      }),
+    ]);
+  } finally {
+    refreshingUsers.delete(userId);
+  }
 }

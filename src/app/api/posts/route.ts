@@ -7,8 +7,8 @@ import { computeCompositeScore, recomputeUserRanks } from '@/lib/services/moment
 
 const querySchema = z.object({
   userId: z.string().optional(),
-  page: z.coerce.number().default(1),
-  pageSize: z.coerce.number().max(50).default(20),
+  page: z.coerce.number().min(1).default(1),
+  pageSize: z.coerce.number().min(1).max(50).default(20),
 });
 
 const createPostSchema = z.object({

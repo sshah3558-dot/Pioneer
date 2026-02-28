@@ -30,20 +30,13 @@ export async function POST(
       );
     }
 
-    // Check if already saved
-    const existing = await prisma.momentSave.findUnique({
+    await prisma.momentSave.upsert({
       where: { userId_postId: { userId: user.id, postId } },
+      update: {},  // already exists, do nothing
+      create: { userId: user.id, postId },
     });
 
-    if (existing) {
-      return NextResponse.json({ saved: true });
-    }
-
-    await prisma.momentSave.create({
-      data: { userId: user.id, postId },
-    });
-
-    return NextResponse.json({ saved: true }, { status: 201 });
+    return NextResponse.json({ saved: true }, { status: 200 });
   } catch (error) {
     console.error('POST /api/moments/[id]/save error:', error);
     return NextResponse.json(

@@ -15,8 +15,8 @@ const querySchema = z.object({
   countryId: z.string().optional(),
   followingOnly: z.coerce.boolean().optional(),
   status: z.enum(VALID_STATUSES as [TripStatus, ...TripStatus[]]).optional(),
-  page: z.coerce.number().default(1),
-  pageSize: z.coerce.number().max(50).default(20),
+  page: z.coerce.number().min(1).default(1),
+  pageSize: z.coerce.number().min(1).max(50).default(20),
   sortBy: z.enum(['recent', 'popular']).optional(),
 });
 

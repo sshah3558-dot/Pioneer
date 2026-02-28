@@ -11,6 +11,7 @@ export async function GET() {
         city: { select: { name: true } },
       },
       orderBy: { postCount: 'desc' },
+      take: 100,
     });
 
     const response = NextResponse.json({

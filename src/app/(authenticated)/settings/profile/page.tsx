@@ -28,14 +28,16 @@ export default function ProfileSettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  if (user && !initialized) {
-    setName(user.name || '');
-    setUsername(user.username || '');
-    setBio(user.bio || '');
-    setAvatarUrl(user.avatarUrl);
-    setCoverImageUrl(user.coverImageUrl);
-    setInitialized(true);
-  }
+  useEffect(() => {
+    if (user && !initialized) {
+      setName(user.name || '');
+      setUsername(user.username || '');
+      setBio(user.bio || '');
+      setAvatarUrl(user.avatarUrl);
+      setCoverImageUrl(user.coverImageUrl);
+      setInitialized(true);
+    }
+  }, [user, initialized]);
 
   // Clean up object URLs on unmount or when previews change
   useEffect(() => {
@@ -200,7 +202,7 @@ export default function ProfileSettingsPage() {
       <div className="p-6 space-y-5">
         {/* Upload errors */}
         {(avatarUpload.error || coverUpload.error) && (
-          <div className="bg-red-50 text-red-600 text-sm rounded-xl p-3">
+          <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm rounded-xl p-3">
             {avatarUpload.error || coverUpload.error}
           </div>
         )}
@@ -266,7 +268,7 @@ export default function ProfileSettingsPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 text-red-600 text-sm rounded-xl p-3">
+          <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm rounded-xl p-3">
             {error}
           </div>
         )}

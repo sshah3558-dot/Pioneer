@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api/fetcher';
+import { timeAgo } from '@/lib/utils/date';
 
 interface RecentTrip {
   id: string;
@@ -19,16 +20,6 @@ export function TripActivity() {
   });
 
   const trips = data?.items || [];
-
-  const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
-  };
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6">

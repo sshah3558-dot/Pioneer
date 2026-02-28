@@ -44,7 +44,8 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
     try {
       // Pass the previous state so the parent knows which HTTP method to use
       await onToggleSave(moment.id, previousState);
-    } catch {
+    } catch (err) {
+      console.error('Failed to save moment:', err);
       // Roll back on failure
       setSaved(previousState);
     }

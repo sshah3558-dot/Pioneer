@@ -6,6 +6,7 @@ import { ReviewCard as ReviewCardType } from '@/types/review';
 import { Avatar } from '@/components/shared/UserPreview';
 import { RatingStars } from '@/components/shared/RatingStars';
 import { cn } from '@/lib/utils';
+import { formatDate } from '@/lib/utils/date';
 import { useState } from 'react';
 
 interface ReviewCardProps {
@@ -25,14 +26,6 @@ export function ReviewCard({
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
   };
 
   return (

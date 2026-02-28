@@ -1,6 +1,7 @@
 'use client';
 
 import { TripCard } from '@/types/trip';
+import { formatDate } from '@/lib/utils/date';
 
 interface TripPlannerCardProps {
   trip: TripCard;
@@ -15,15 +16,6 @@ export function TripPlannerCard({ trip }: TripPlannerCardProps) {
 
   const config = statusConfig[trip.status];
   const isActive = trip.status === 'IN_PROGRESS' || trip.status === 'PLANNING';
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return '';
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
 
   const dateRange =
     trip.startDate && trip.endDate

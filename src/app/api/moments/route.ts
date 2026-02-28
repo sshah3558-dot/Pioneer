@@ -30,8 +30,8 @@ const querySchema = z.object({
   country: z.string().optional(),
   search: z.string().optional(),
   saved: z.string().optional(),
-  page: z.coerce.number().default(1),
-  pageSize: z.coerce.number().max(50).default(20),
+  page: z.coerce.number().min(1).default(1),
+  pageSize: z.coerce.number().min(1).max(50).default(20),
 });
 
 export async function GET(request: NextRequest) {
@@ -182,7 +182,9 @@ export async function GET(request: NextRequest) {
 
     // Fire-and-forget: refresh pre-computed recommendations in the background
     if (query.filter === 'recommended' && currentUser) {
-      refreshRecommendationsForUser(currentUser.id).catch(() => {});
+      refreshRecommendationsForUser(currentUser.id).catch((err) => {
+        console.error('Background recommendation refresh failed:', err);
+      });
     }
 
     return NextResponse.json({

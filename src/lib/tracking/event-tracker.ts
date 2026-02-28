@@ -32,13 +32,22 @@ class EventTracker {
 
   private flush() {
     if (this.buffer.length === 0) return;
-    const events = this.buffer.splice(0, MAX_BATCH_SIZE);
+    const events = this.buffer.slice(0, MAX_BATCH_SIZE); // clone, don't splice
     fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ events }),
       keepalive: true,
-    }).catch(() => {});
+    })
+    .then((res) => {
+      if (res.ok) {
+        // Only remove sent events on success
+        this.buffer.splice(0, events.length);
+      }
+    })
+    .catch(() => {
+      // Events stay in buffer for next flush
+    });
   }
 
   destroy() {
