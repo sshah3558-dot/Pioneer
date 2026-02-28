@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import { apiFetch } from '@/lib/api/fetcher';
@@ -111,17 +112,29 @@ export default function ProfileSettingsPage() {
     avatarUrl ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'U')}&background=667eea&color=fff&size=128`;
   const displayCover = coverPreview || coverImageUrl;
+  const isBlobUrl = (url: string) => url.startsWith('blob:');
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
       {/* Cover Photo */}
       <div className="relative h-48 bg-gradient-to-r from-purple-600 to-pink-500">
         {displayCover && (
-          <img
-            src={displayCover}
-            alt="Cover"
-            className="w-full h-full object-cover"
-          />
+          isBlobUrl(displayCover) ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={displayCover}
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Image
+              src={displayCover}
+              alt="Cover"
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+          )
         )}
         <button
           onClick={() => coverInputRef.current?.click()}
@@ -146,11 +159,22 @@ export default function ProfileSettingsPage() {
       {/* Avatar */}
       <div className="flex justify-center -mt-12 relative z-10">
         <div className="relative">
-          <img
-            src={displayAvatar}
-            alt="Avatar"
-            className="w-24 h-24 rounded-full border-4 border-white object-cover shadow-lg"
-          />
+          {isBlobUrl(displayAvatar) ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={displayAvatar}
+              alt="Avatar"
+              className="w-24 h-24 rounded-full border-4 border-white object-cover shadow-lg"
+            />
+          ) : (
+            <Image
+              src={displayAvatar}
+              alt="Avatar"
+              width={96}
+              height={96}
+              className="w-24 h-24 rounded-full border-4 border-white object-cover shadow-lg"
+            />
+          )}
           <button
             onClick={() => avatarInputRef.current?.click()}
             className="absolute bottom-0 right-0 bg-purple-600 hover:bg-purple-700 text-white p-1.5 rounded-full transition-colors"

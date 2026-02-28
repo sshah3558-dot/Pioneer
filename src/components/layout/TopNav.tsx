@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { LogOut } from 'lucide-react';
@@ -92,9 +93,11 @@ export function TopNav() {
                 onClick={() => setShowMenu(!showMenu)}
                 className="focus:outline-none"
               >
-                <img
+                <Image
                   src={avatarUrl}
                   alt="User avatar"
+                  width={40}
+                  height={40}
                   className="w-10 h-10 rounded-full border-2 border-purple-500 object-cover"
                 />
               </button>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Bookmark, MapPin } from 'lucide-react';
 import { PlaceCard as PlaceCardType } from '@/types/place';
 import { RatingStars } from '@/components/shared/RatingStars';
@@ -39,9 +40,11 @@ export function PlaceCard({ place, variant = 'default', className, onSave }: Pla
         <div className="flex gap-3 p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
           <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 relative">
             {place.imageUrl ? (
-              <img
+              <Image
                 src={place.imageUrl}
                 alt={place.name}
+                width={96}
+                height={96}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -89,9 +92,11 @@ export function PlaceCard({ place, variant = 'default', className, onSave }: Pla
         <div className="flex gap-3 p-2 bg-white rounded-lg hover:bg-gray-50 transition-colors">
           <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
             {place.imageUrl ? (
-              <img
+              <Image
                 src={place.imageUrl}
                 alt={place.name}
+                width={56}
+                height={56}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -119,9 +124,11 @@ export function PlaceCard({ place, variant = 'default', className, onSave }: Pla
         {/* Image */}
         <div className="relative h-40 overflow-hidden">
           {place.imageUrl ? (
-            <img
+            <Image
               src={place.imageUrl}
               alt={place.name}
+              width={400}
+              height={160}
               className="w-full h-full object-cover"
             />
           ) : (

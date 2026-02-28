@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { CreateMoment } from '@/components/moments/CreateMoment';
 import { Plus } from 'lucide-react';
@@ -13,9 +14,11 @@ export function CreatePost() {
     <>
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-4 sm:p-6">
         <div className="flex items-center gap-3 sm:gap-4">
-          <img
+          <Image
             src={user?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=667eea&color=fff&size=48`}
             alt={user?.name || 'User'}
+            width={48}
+            height={48}
             className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0"
           />
           <button

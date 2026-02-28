@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 
 export function ProfileSummary() {
@@ -28,9 +29,11 @@ export function ProfileSummary() {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-6">
       <div className="text-center mb-4">
-        <img
+        <Image
           src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=667eea&color=fff`}
           alt={user.name || 'User'}
+          width={96}
+          height={96}
           className="w-24 h-24 rounded-full mx-auto mb-3 border-4 border-purple-500 shadow-lg object-cover"
         />
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">{user.name}</h3>

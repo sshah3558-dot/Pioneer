@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import { apiFetch } from '@/lib/api/fetcher';
 import { Bookmark, MapPin, Plus } from 'lucide-react';
 import { ScoreBadge } from './ScoreBadge';
@@ -70,7 +71,7 @@ export function SavedMoments({ onAddToTrip }: SavedMomentsProps) {
           {moments.map((moment) => (
             <div key={moment.id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
               {moment.imageUrl ? (
-                <img src={moment.imageUrl} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
+                <Image src={moment.imageUrl} alt="" width={56} height={56} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
               ) : (
                 <div className="w-14 h-14 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
                   <MapPin className="w-5 h-5 text-gray-400" />

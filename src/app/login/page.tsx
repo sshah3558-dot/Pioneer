@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { LoginForm } from '@/components/auth/LoginForm';
 
 export default function LoginPage() {
@@ -33,9 +34,11 @@ export default function LoginPage() {
       {/* Right side - Image (hidden on mobile) */}
       <div className="hidden lg:block lg:w-1/2 relative">
         <div className="absolute inset-0 gradient-primary opacity-90" />
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=1600&fit=crop"
           alt="Travel"
+          fill
+          priority
           className="absolute inset-0 w-full h-full object-cover mix-blend-overlay"
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { MessageCircle, Eye } from 'lucide-react';
 
 export interface ForumPostItem {
@@ -47,9 +48,11 @@ export function ForumPost({ post }: ForumPostProps) {
       )}
 
       <div className="flex items-start gap-4">
-        <img
+        <Image
           src={post.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name || 'U')}&background=667eea&color=fff`}
           alt={post.user.name || ''}
+          width={48}
+          height={48}
           className="w-12 h-12 rounded-full border-2 border-purple-300 object-cover"
         />
         <div className="flex-1">

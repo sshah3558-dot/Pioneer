@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { UserProfile } from '@/types/user';
 import { GradientButton } from '@/components/shared/GradientButton';
 import Link from 'next/link';
@@ -46,10 +47,12 @@ export function ProfileHeader({
       {/* Cover Photo */}
       <div className="h-24 sm:h-32 md:h-44 relative">
         {user.coverImageUrl ? (
-          <img
+          <Image
             src={user.coverImageUrl}
             alt="Cover"
-            className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400" />
@@ -60,9 +63,11 @@ export function ProfileHeader({
       <div className="px-4 sm:px-6 pb-4">
         {/* Avatar + Action button row */}
         <div className="flex items-end justify-between -mt-8 sm:-mt-12 mb-3">
-          <img
+          <Image
             src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=667eea&color=fff&size=128`}
             alt={user.name || 'User'}
+            width={112}
+            height={112}
             className="w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full border-3 sm:border-4 border-purple-500 shadow-xl object-cover"
           />
           <div className="mb-1">

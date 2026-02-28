@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Trash2 } from 'lucide-react';
 import { FeedActivity } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
@@ -163,11 +164,17 @@ export function FeedCard({ activity, className }: FeedCardProps) {
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <Link href={`/users/${activity.user.username}`}>
-            <img
-              src={activity.user.avatarUrl || ''}
-              alt={activity.user.name || 'User'}
-              className="w-12 h-12 rounded-full border-2 border-purple-300 object-cover"
-            />
+            {activity.user.avatarUrl ? (
+              <Image
+                src={activity.user.avatarUrl}
+                alt={activity.user.name || 'User'}
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full border-2 border-purple-300 object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full border-2 border-purple-300 bg-gradient-to-br from-purple-400 to-pink-400" />
+            )}
           </Link>
           <div className="flex-1">
             <Link href={`/users/${activity.user.username}`} className="font-bold text-gray-900 dark:text-gray-100 hover:underline">
@@ -222,7 +229,7 @@ export function FeedCard({ activity, className }: FeedCardProps) {
             >
               {images.map((img, i) => (
                 <div key={i} className="w-full flex-shrink-0 snap-center">
-                  <img src={img} alt="" className="w-full h-80 object-cover rounded-xl" />
+                  <Image src={img} alt="" width={800} height={320} className="w-full h-80 object-cover rounded-xl" />
                 </div>
               ))}
             </div>

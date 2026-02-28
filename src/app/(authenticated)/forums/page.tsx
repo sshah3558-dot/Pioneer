@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { RankingCard } from '@/components/moments/RankingCard';
-import { CreateMoment } from '@/components/moments/CreateMoment';
 import { apiFetch } from '@/lib/api/fetcher';
 import { Trophy, Plus } from 'lucide-react';
+
+const CreateMoment = dynamic(() => import('@/components/moments/CreateMoment').then(m => m.CreateMoment), { loading: () => null });
 
 export default function RankingsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -126,9 +129,11 @@ export default function RankingsPage() {
 
                   {/* Photo thumbnail */}
                   {moment.imageUrl && (
-                    <img
+                    <Image
                       src={moment.imageUrl}
                       alt=""
+                      width={64}
+                      height={64}
                       className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
                     />
                   )}

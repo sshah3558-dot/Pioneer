@@ -1,15 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TripPlannerCard } from '@/components/trips/TripPlannerCard';
 import { TripActivity } from '@/components/trips/TripActivity';
 import { QuickAdd } from '@/components/trips/QuickAdd';
-import { CreateTripModal } from '@/components/trips/CreateTripModal';
 import { apiFetch } from '@/lib/api/fetcher';
 import { GetTripsResponse } from '@/types/api';
 import { useSession } from 'next-auth/react';
 import { SavedMoments } from '@/components/moments/SavedMoments';
+
+const CreateTripModal = dynamic(() => import('@/components/trips/CreateTripModal').then(m => m.CreateTripModal), { loading: () => null });
 
 export default function PlannerPage() {
   const { data: session } = useSession();

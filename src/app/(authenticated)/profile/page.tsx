@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import { ProfileHeader } from '@/components/users/ProfileHeader';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { apiFetch } from '@/lib/api/fetcher';
@@ -92,7 +93,7 @@ export default function ProfilePage() {
             <div key={post.id} className="card-hover bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
               {post.imageUrl && (
                 <div className="relative">
-                  <img src={post.imageUrl} alt="" className="w-full h-48 object-cover" />
+                  <Image src={post.imageUrl} alt="" width={800} height={192} className="w-full h-48 object-cover" />
                   {post.compositeScore != null && (
                     <div className="absolute top-2 right-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
                       <Star className="w-3 h-3 fill-white" />

@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Bookmark, Eye, MapPin } from 'lucide-react';
 import { ScoreBadge } from './ScoreBadge';
+import { useTrackView } from '@/lib/hooks/useTrackView';
+import { tracker } from '@/lib/tracking/event-tracker';
 
 interface MomentCardProps {
   moment: {
@@ -29,6 +32,7 @@ interface MomentCardProps {
 
 export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
   const [saved, setSaved] = useState(moment.isSaved);
+  const viewRef = useTrackView(moment.id, 'MOMENT');
 
   const handleSave = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -36,6 +40,7 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
     const newState = !saved;
     // Optimistically toggle
     setSaved(newState);
+    tracker?.track(newState ? 'SAVE' : 'UNSAVE', moment.id, 'MOMENT');
     try {
       // Pass the previous state so the parent knows which HTTP method to use
       await onToggleSave(moment.id, previousState);
@@ -46,13 +51,15 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden card-hover">
+    <div ref={viewRef} className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden card-hover">
       {/* Image with score badge */}
       <div className="relative">
         {moment.imageUrl ? (
-          <img
+          <Image
             src={moment.imageUrl}
             alt=""
+            width={800}
+            height={300}
             className="w-full h-48 object-cover"
           />
         ) : (
@@ -85,9 +92,11 @@ export function MomentCard({ moment, onToggleSave }: MomentCardProps) {
       <div className="p-3">
         {/* User info */}
         <div className="flex items-center gap-2 mb-2">
-          <img
+          <Image
             src={moment.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(moment.user.name || 'U')}&background=667eea&color=fff&size=32`}
             alt=""
+            width={24}
+            height={24}
             className="w-6 h-6 rounded-full object-cover"
           />
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">

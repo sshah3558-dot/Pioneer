@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { SignupForm } from '@/components/auth/SignupForm';
 
 export default function SignupPage() {
@@ -33,9 +34,11 @@ export default function SignupPage() {
       {/* Right side - Image (hidden on mobile) */}
       <div className="hidden lg:block lg:w-1/2 relative">
         <div className="absolute inset-0 gradient-secondary opacity-90" />
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&h=1600&fit=crop"
           alt="Travel adventure"
+          fill
+          priority
           className="absolute inset-0 w-full h-full object-cover mix-blend-overlay"
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">

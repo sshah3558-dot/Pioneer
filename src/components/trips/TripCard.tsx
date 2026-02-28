@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Heart, MapPin, Calendar, MoreHorizontal } from 'lucide-react';
 import { TripCard as TripCardType } from '@/types/trip';
 import { Avatar } from '@/components/shared/UserPreview';
@@ -46,9 +47,11 @@ export function TripCard({ trip, variant = 'default', className, onLike }: TripC
         <div className="flex gap-3 p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
           <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
             {trip.coverImageUrl ? (
-              <img
+              <Image
                 src={trip.coverImageUrl}
                 alt={trip.title}
+                width={80}
+                height={80}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -80,9 +83,11 @@ export function TripCard({ trip, variant = 'default', className, onLike }: TripC
         {/* Cover Image */}
         <div className="relative h-48 overflow-hidden">
           {trip.coverImageUrl ? (
-            <img
+            <Image
               src={trip.coverImageUrl}
               alt={trip.title}
+              width={800}
+              height={192}
               className="w-full h-full object-cover"
             />
           ) : (

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api/fetcher';
 
@@ -38,9 +39,11 @@ export function TripActivity() {
         <div className="space-y-4">
           {trips.map((trip) => (
             <div key={trip.id} className="flex gap-3">
-              <img
+              <Image
                 src={trip.user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(trip.user.name || 'U')}&background=667eea&color=fff&size=40`}
                 alt={trip.user.name || ''}
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>

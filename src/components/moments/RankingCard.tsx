@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ScoreBadge } from './ScoreBadge';
 import { ChevronDown, ChevronUp, MapPin, Star } from 'lucide-react';
 import { useState } from 'react';
@@ -57,9 +58,11 @@ export function RankingCard({ moment }: RankingCardProps) {
 
         {/* Photo thumbnail */}
         {moment.imageUrl && (
-          <img
+          <Image
             src={moment.imageUrl}
             alt=""
+            width={64}
+            height={64}
             className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
           />
         )}
@@ -89,7 +92,7 @@ export function RankingCard({ moment }: RankingCardProps) {
           {/* Photos */}
           <div className="flex gap-2 mb-3 overflow-x-auto">
             {[moment.imageUrl, moment.imageUrl2, moment.imageUrl3].filter(Boolean).map((url, i) => (
-              <img key={i} src={url!} alt="" className="h-48 rounded-xl object-cover" />
+              <Image key={i} src={url!} alt="" width={400} height={192} className="h-48 rounded-xl object-cover" />
             ))}
           </div>
 

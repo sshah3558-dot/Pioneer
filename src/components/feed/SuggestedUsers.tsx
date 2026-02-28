@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api/fetcher';
 
@@ -92,9 +93,11 @@ export function SuggestedUsers() {
           const isLoadingFollow = loadingIds.has(user.id);
           return (
             <div key={user.id} className="flex items-center gap-3">
-              <img
+              <Image
                 src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=667eea&color=fff`}
                 alt={user.name || 'User'}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700 object-cover"
               />
               <div className="flex-1 min-w-0">
