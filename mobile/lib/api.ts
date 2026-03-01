@@ -1,6 +1,14 @@
-import { getToken } from './auth';
+import { getToken, clearToken } from './auth';
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+
+/** Callback invoked when the server returns 401 (token expired/invalid). */
+let onUnauthorized: (() => void) | null = null;
+
+/** Register a callback for 401 responses (e.g., to trigger logout). */
+export function setOnUnauthorized(cb: () => void) {
+  onUnauthorized = cb;
+}
 
 class ApiClient {
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -14,6 +22,12 @@ class ApiClient {
     }
 
     const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+
+    if (res.status === 401) {
+      await clearToken();
+      onUnauthorized?.();
+      throw new Error('Session expired. Please log in again.');
+    }
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));

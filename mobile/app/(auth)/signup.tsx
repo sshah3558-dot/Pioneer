@@ -65,7 +65,7 @@ export default function SignupScreen() {
 
     try {
       await signup(name.trim(), email.trim(), username.trim(), password);
-      router.replace('/(tabs)/feed');
+      router.replace('/onboarding');
     } catch (err: any) {
       setError(err.message || 'Signup failed. Please try again.');
     } finally {

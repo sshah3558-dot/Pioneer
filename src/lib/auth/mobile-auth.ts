@@ -42,8 +42,13 @@ export async function getCurrentUser(request?: NextRequest) {
     const auth = request.headers.get('authorization');
     if (auth?.startsWith('Bearer ')) {
       try {
-        const secret = process.env.NEXTAUTH_SECRET || 'dev-secret';
-        const decoded = jwt.verify(auth.slice(7), secret) as MobileToken;
+        const secret = process.env.NEXTAUTH_SECRET;
+        if (!secret) {
+          if (process.env.NODE_ENV === 'production') return null;
+          // dev-only fallback
+        }
+        const signingSecret = secret || 'dev-secret';
+        const decoded = jwt.verify(auth.slice(7), signingSecret) as MobileToken;
         return prisma.user.findUnique({
           where: { email: decoded.email },
           select: USER_SELECT,

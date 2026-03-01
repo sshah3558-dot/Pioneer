@@ -1,20 +1,12 @@
-import { View, Text, Pressable, Dimensions } from 'react-native';
+import { View, Text, Pressable, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Bookmark, Eye } from 'lucide-react-native';
 import type { Moment } from '../../../shared/types';
+import { scoreBadgeColor } from '../../lib/utils/scoring';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_GAP = 12;
 const CARD_PADDING = 16;
-const CARD_WIDTH = (SCREEN_WIDTH - CARD_PADDING * 2 - CARD_GAP) / 2;
-
-function scoreBadgeColor(score: number): string {
-  if (score >= 8) return 'bg-green-500';
-  if (score >= 6) return 'bg-lime-500';
-  if (score >= 4) return 'bg-amber-500';
-  return 'bg-red-500';
-}
 
 function formatViewCount(count: number): string {
   if (count >= 1000) return `${(count / 1000).toFixed(1)}k`;
@@ -27,14 +19,17 @@ interface MomentCardProps {
 }
 
 export default function MomentCard({ moment, onToggleSave }: MomentCardProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const cardWidth = (screenWidth - CARD_PADDING * 2 - CARD_GAP) / 2;
+
   return (
     <Pressable
       className="rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800"
-      style={{ width: CARD_WIDTH }}
+      style={{ width: cardWidth }}
       onPress={() => router.push(`/moments/${moment.id}`)}
     >
       {/* Image with overlays */}
-      <View style={{ width: CARD_WIDTH, height: CARD_WIDTH * (4 / 3) }}>
+      <View style={{ width: cardWidth, height: cardWidth * (4 / 3) }}>
         {moment.imageUrl ? (
           <Image
             source={{ uri: moment.imageUrl }}
@@ -72,7 +67,7 @@ export default function MomentCard({ moment, onToggleSave }: MomentCardProps) {
         )}
 
         {/* Bottom overlay - user + place */}
-        <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-2 pb-2 pt-6">
+        <View className="absolute bottom-0 left-0 right-0 bg-black/50 px-2 pb-2 pt-6">
           <View className="flex-row items-center">
             {moment.user.avatarUrl ? (
               <Image

@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { MapPin, Heart, Calendar, Navigation } from 'lucide-react-native';
 import { router } from 'expo-router';
 import type { TripCard as TripCardType } from '../../../shared/types';
+import UserAvatar from '../shared/UserAvatar';
 
 function formatDateRange(start: string | null, end: string | null): string {
   if (!start) return 'Dates TBD';
@@ -11,7 +12,6 @@ function formatDateRange(start: string | null, end: string | null): string {
   if (!end) return fmt(start);
   const s = new Date(start);
   const e = new Date(end);
-  // Same month — "Mar 5 - 12, 2026"
   if (s.getMonth() === e.getMonth() && s.getFullYear() === e.getFullYear()) {
     return `${fmt(start)} - ${e.getDate()}, ${e.getFullYear()}`;
   }
@@ -23,25 +23,6 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; label: string }>
   IN_PROGRESS: { bg: 'bg-green-500', text: 'text-white', label: 'In Progress' },
   COMPLETED: { bg: 'bg-gray-500', text: 'text-white', label: 'Completed' },
 };
-
-function UserAvatar({ avatarUrl, name }: { avatarUrl: string | null; name: string | null }) {
-  if (avatarUrl) {
-    return (
-      <Image
-        source={{ uri: avatarUrl }}
-        className="w-7 h-7 rounded-full bg-gray-200"
-        contentFit="cover"
-      />
-    );
-  }
-  return (
-    <View className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900 items-center justify-center">
-      <Text className="text-purple-600 dark:text-purple-300 font-bold text-[10px]">
-        {(name || '?')[0].toUpperCase()}
-      </Text>
-    </View>
-  );
-}
 
 interface TripCardProps {
   trip: TripCardType;
@@ -123,7 +104,7 @@ export default function TripCard({ trip }: TripCardProps) {
 
         {/* User */}
         <View className="flex-row items-center">
-          <UserAvatar avatarUrl={trip.user.avatarUrl} name={trip.user.name} />
+          <UserAvatar avatarUrl={trip.user.avatarUrl} name={trip.user.name} size={28} fontSize="text-[10px]" />
           <Text
             className="text-gray-700 dark:text-gray-300 text-xs font-medium ml-1.5"
             numberOfLines={1}

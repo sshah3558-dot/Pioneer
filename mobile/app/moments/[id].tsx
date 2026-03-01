@@ -6,10 +6,10 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
-  Dimensions,
   FlatList,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  useWindowDimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -23,28 +23,9 @@ import {
   Star,
 } from 'lucide-react-native';
 import { api } from '../../lib/api';
+import { timeAgo } from '../../lib/utils/date';
+import { scoreBadgeColor } from '../../lib/utils/scoring';
 import type { Moment } from '../../../shared/types';
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
-
-function timeAgo(dateStr: string): string {
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return 'Just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-function scoreBadgeColor(score: number): string {
-  if (score >= 8) return 'bg-green-500';
-  if (score >= 6) return 'bg-lime-500';
-  if (score >= 4) return 'bg-amber-500';
-  return 'bg-red-500';
-}
 
 function RatingRow({ label, rating }: { label: string; rating: number | null }) {
   if (rating == null) return null;
@@ -70,14 +51,15 @@ function RatingRow({ label, rating }: { label: string; rating: number | null }) 
 
 function ImageCarousel({ images }: { images: string[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const { width: screenWidth } = useWindowDimensions();
 
   const onScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offset = event.nativeEvent.contentOffset.x;
-      const index = Math.round(offset / SCREEN_WIDTH);
+      const index = Math.round(offset / screenWidth);
       setActiveIndex(index);
     },
-    []
+    [screenWidth]
   );
 
   if (images.length === 0) return null;
@@ -86,7 +68,7 @@ function ImageCarousel({ images }: { images: string[] }) {
     return (
       <Image
         source={{ uri: images[0] }}
-        style={{ width: SCREEN_WIDTH, height: SCREEN_WIDTH }}
+        style={{ width: screenWidth, height: screenWidth }}
         contentFit="cover"
       />
     );
@@ -105,7 +87,7 @@ function ImageCarousel({ images }: { images: string[] }) {
         renderItem={({ item }) => (
           <Image
             source={{ uri: item }}
-            style={{ width: SCREEN_WIDTH, height: SCREEN_WIDTH }}
+            style={{ width: screenWidth, height: screenWidth }}
             contentFit="cover"
           />
         )}

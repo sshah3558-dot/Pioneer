@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { api } from '../lib/api';
+import { api, setOnUnauthorized } from '../lib/api';
 import { getToken, setToken, clearToken, setStoredUser, getStoredUser } from '../lib/auth';
+import { queryClient } from '../lib/query';
 import type { UserProfile } from '../../shared/types';
 
 interface AuthState {
@@ -62,8 +63,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     await clearToken();
+    queryClient.clear();
     setState({ user: null, isLoading: false, isAuthenticated: false });
   };
+
+  // Handle 401 responses from API (expired token)
+  useEffect(() => {
+    setOnUnauthorized(() => {
+      queryClient.clear();
+      setState({ user: null, isLoading: false, isAuthenticated: false });
+    });
+  }, []);
 
   return (
     <AuthContext.Provider value={{ ...state, login, signup, logout, refreshUser }}>

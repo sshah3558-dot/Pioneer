@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { View, Animated, StyleSheet } from 'react-native';
+import { View, Animated, useColorScheme } from 'react-native';
 
 function ShimmerBlock({ width, height, borderRadius = 8 }: { width: number | string; height: number; borderRadius?: number }) {
   const opacity = useRef(new Animated.Value(0.3)).current;
+  const colorScheme = useColorScheme();
+  const bgColor = colorScheme === 'dark' ? '#374151' : '#E5E7EB';
 
   useEffect(() => {
     const animation = Animated.loop(
@@ -25,15 +27,13 @@ function ShimmerBlock({ width, height, borderRadius = 8 }: { width: number | str
 
   return (
     <Animated.View
-      style={[
-        styles.shimmer,
-        {
-          width: width as number,
-          height,
-          borderRadius,
-          opacity,
-        },
-      ]}
+      style={{
+        backgroundColor: bgColor,
+        width: width as number,
+        height,
+        borderRadius,
+        opacity,
+      }}
     />
   );
 }
@@ -146,8 +146,3 @@ export function FeedListSkeleton({ count = 3 }: { count?: number }) {
   );
 }
 
-const styles = StyleSheet.create({
-  shimmer: {
-    backgroundColor: '#E5E7EB',
-  },
-});

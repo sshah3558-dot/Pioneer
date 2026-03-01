@@ -3,44 +3,9 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Heart, Star, MapPin, UserPlus, Plane } from 'lucide-react-native';
 import type { FeedItem } from '../../../shared/types';
-
-function timeAgo(dateStr: string): string {
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return 'Just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-function scoreBadgeColor(score: number): string {
-  if (score >= 8) return 'bg-green-500';
-  if (score >= 6) return 'bg-lime-500';
-  if (score >= 4) return 'bg-amber-500';
-  return 'bg-red-500';
-}
-
-function UserAvatar({ avatarUrl, name }: { avatarUrl: string | null; name: string | null }) {
-  if (avatarUrl) {
-    return (
-      <Image
-        source={{ uri: avatarUrl }}
-        className="w-10 h-10 rounded-full bg-gray-200"
-        contentFit="cover"
-      />
-    );
-  }
-  return (
-    <View className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 items-center justify-center">
-      <Text className="text-purple-600 dark:text-purple-300 font-bold text-sm">
-        {(name || '?')[0].toUpperCase()}
-      </Text>
-    </View>
-  );
-}
+import { timeAgo } from '../../lib/utils/date';
+import { scoreBadgeColor } from '../../lib/utils/scoring';
+import UserAvatar from '../shared/UserAvatar';
 
 function PostCard({ item }: { item: FeedItem }) {
   const post = item.post;

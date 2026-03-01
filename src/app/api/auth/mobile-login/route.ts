@@ -54,7 +54,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const secret = process.env.NEXTAUTH_SECRET || 'dev-secret';
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret) {
+      if (process.env.NODE_ENV === 'production') {
+        console.error('NEXTAUTH_SECRET is not set in production');
+        return NextResponse.json(
+          { error: { message: 'Server configuration error', code: 'CONFIG_ERROR' } },
+          { status: 500 }
+        );
+      }
+      // Allow dev-secret only in development — will be caught by the variable being undefined below
+    }
+    const signingSecret = secret || 'dev-secret';
     const token = jwt.sign(
       {
         id: user.id,
@@ -62,7 +73,7 @@ export async function POST(request: NextRequest) {
         username: user.username,
         onboardingComplete: user.onboardingComplete,
       },
-      secret,
+      signingSecret,
       { expiresIn: '30d' }
     );
 

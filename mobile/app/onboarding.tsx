@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
-  Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Check } from 'lucide-react-native';
 import { api } from '../lib/api';
@@ -346,10 +346,12 @@ export default function OnboardingScreen() {
 
   const CurrentStep = steps[step];
 
+  const insets = useSafeAreaInsets();
+
   return (
     <View className="flex-1 bg-white dark:bg-gray-950">
       {/* Safe area spacer */}
-      <View className="pt-14">
+      <View style={{ paddingTop: insets.top }}>
         <StepDots />
       </View>
 

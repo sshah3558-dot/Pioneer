@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   FlatList,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import { api } from '../../lib/api';
+import { useDebounce } from '../../lib/hooks/useDebounce';
 import MomentCard from '../../components/moments/MomentCard';
 import type { Moment, PaginatedResponse } from '../../../shared/types';
 
@@ -22,15 +23,6 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: 'mostViewed', label: 'Most Viewed' },
   { key: 'topRated', label: 'Top Rated' },
 ];
-
-function useDebounce(value: string, delay: number): string {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return debounced;
-}
 
 function SkeletonCard() {
   return (

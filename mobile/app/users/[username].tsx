@@ -68,12 +68,14 @@ export default function UserProfileScreen() {
       }
     },
     onMutate: () => {
-      // Optimistic update
+      const previous = effectiveFollowing;
       setIsFollowing(!effectiveFollowing);
+      return { previous };
     },
-    onError: () => {
-      // Revert on error
-      setIsFollowing(effectiveFollowing);
+    onError: (_err: unknown, _vars: void, context: { previous: boolean } | undefined) => {
+      if (context?.previous !== undefined) {
+        setIsFollowing(context.previous);
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['userProfile', username] });

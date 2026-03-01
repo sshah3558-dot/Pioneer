@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import type { UserProfile } from '../../shared/types';
 
 const TOKEN_KEY = 'pioneer_jwt';
 const USER_KEY = 'pioneer_user';
@@ -16,11 +17,11 @@ export async function clearToken(): Promise<void> {
   await SecureStore.deleteItemAsync(USER_KEY);
 }
 
-export async function getStoredUser(): Promise<any | null> {
+export async function getStoredUser(): Promise<UserProfile | null> {
   const raw = await SecureStore.getItemAsync(USER_KEY);
-  return raw ? JSON.parse(raw) : null;
+  return raw ? (JSON.parse(raw) as UserProfile) : null;
 }
 
-export async function setStoredUser(user: any): Promise<void> {
+export async function setStoredUser(user: UserProfile): Promise<void> {
   await SecureStore.setItemAsync(USER_KEY, JSON.stringify(user));
 }

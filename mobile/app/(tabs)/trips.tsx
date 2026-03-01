@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   FlatList,
@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { Plus, X, Search, MapPin, ChevronRight } from 'lucide-react-native';
 import { api } from '../../lib/api';
+import { useDebounce } from '../../lib/hooks/useDebounce';
 import TripCard from '../../components/trips/TripCard';
 import type { TripCard as TripCardType, PaginatedResponse, CreateTripInput } from '../../../shared/types';
 
@@ -25,15 +26,6 @@ interface CityResult {
   id: string;
   name: string;
   country: { name: string };
-}
-
-function useDebounce(value: string, delay: number): string {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return debounced;
 }
 
 function CreateTripModal({
