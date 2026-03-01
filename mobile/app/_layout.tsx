@@ -5,11 +5,13 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '../lib/query';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, useColorScheme } from 'react-native';
 
 function RootNavigator() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const segments = useSegments();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   useEffect(() => {
     if (isLoading) return;
@@ -28,7 +30,7 @@ function RootNavigator() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#111827' : '#FFFFFF' }}>
         <ActivityIndicator size="large" color="#7C3AED" />
       </View>
     );
@@ -36,11 +38,12 @@ function RootNavigator() {
 
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding" />
+        <Stack.Screen name="trips/[id]" options={{ presentation: 'card' }} />
       </Stack>
     </>
   );
