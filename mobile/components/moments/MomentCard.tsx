@@ -1,5 +1,6 @@
 import { View, Text, Pressable, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import { Bookmark, Eye } from 'lucide-react-native';
 import type { Moment } from '../../../shared/types';
 
@@ -27,9 +28,10 @@ interface MomentCardProps {
 
 export default function MomentCard({ moment, onToggleSave }: MomentCardProps) {
   return (
-    <View
+    <Pressable
       className="rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800"
       style={{ width: CARD_WIDTH }}
+      onPress={() => router.push(`/moments/${moment.id}`)}
     >
       {/* Image with overlays */}
       <View style={{ width: CARD_WIDTH, height: CARD_WIDTH * (4 / 3) }}>
@@ -104,6 +106,6 @@ export default function MomentCard({ moment, onToggleSave }: MomentCardProps) {
           {formatViewCount(moment.viewCount)}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }

@@ -44,6 +44,11 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="trips/[id]" options={{ presentation: 'card' }} />
+        <Stack.Screen name="moments/[id]" options={{ presentation: 'card' }} />
+        <Stack.Screen name="forums/index" options={{ presentation: 'card' }} />
+        <Stack.Screen name="forums/[slug]" options={{ presentation: 'card' }} />
+        <Stack.Screen name="users/[username]" options={{ presentation: 'card' }} />
+        <Stack.Screen name="settings" options={{ presentation: 'card' }} />
       </Stack>
     </>
   );

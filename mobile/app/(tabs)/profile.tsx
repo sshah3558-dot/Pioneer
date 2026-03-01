@@ -50,8 +50,7 @@ export default function ProfileScreen() {
           avgRating={avgRating}
           isOwnProfile={true}
           onEditProfile={() => {
-            // Navigate to settings/profile when available
-            // router.push('/settings/profile');
+            router.push('/settings');
           }}
         />
         <MomentGrid userId="me" />

@@ -1,5 +1,6 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import { Heart, Star, MapPin, UserPlus, Plane } from 'lucide-react-native';
 import type { FeedItem } from '../../../shared/types';
 
@@ -46,7 +47,11 @@ function PostCard({ item }: { item: FeedItem }) {
   if (!post) return null;
 
   return (
-    <View className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
+    <TouchableOpacity
+      className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800"
+      activeOpacity={0.8}
+      onPress={() => router.push(`/moments/${post.id}`)}
+    >
       {/* Header */}
       <View className="flex-row items-center px-4 pt-4 pb-2">
         <UserAvatar avatarUrl={post.user.avatarUrl} name={post.user.name} />
@@ -97,7 +102,7 @@ function PostCard({ item }: { item: FeedItem }) {
           <Text className="text-gray-500 dark:text-gray-400 text-xs ml-1">{post.likeCount}</Text>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

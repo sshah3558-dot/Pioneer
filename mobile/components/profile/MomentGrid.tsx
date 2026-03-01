@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { Camera } from 'lucide-react-native';
 import { api } from '../../lib/api';
 import type { Moment, PaginatedResponse } from '../../../shared/types';
@@ -84,6 +85,7 @@ export default function MomentGrid({ userId }: MomentGridProps) {
                 marginBottom: GAP,
               }}
               activeOpacity={0.8}
+              onPress={() => router.push(`/moments/${moment.id}`)}
             >
               {imageUri ? (
                 <View style={{ width: itemSize, height: itemSize }}>
